@@ -1,8 +1,8 @@
 // ===== CONFIGURACIÓN FINAL PARA TU PROYECTO - VERSIÓN COMPLETA =====
 
 // Configuración de Supabase
-const SUPABASE_URL = 'https://zgvrrprekjsmbsmlavaw.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpndnJycHJla2pzbWJzbWxhdmF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzk0ODAsImV4cCI6MjA2ODYxNTQ4MH0.G68U8d3iYM6HiPV70o7rn-ebVpU0kkYYlwG-P6fNMtE';
+const SUPABASE_URL = 'https://jgjckpiodbswzkajxxsd.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnamNrcGlvZGJzd3prYWp4eHNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyMzcxMTksImV4cCI6MjA2ODgxMzExOX0.bxs1YS_oE5s7Gvsss8w1jBLSiLnSxXywstzQHAQjS3U';
 
 // Inicializar cliente con CDN
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
