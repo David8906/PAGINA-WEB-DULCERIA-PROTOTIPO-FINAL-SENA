@@ -1,0 +1,288 @@
+/* Estilos para la página de contacto */
+.contact-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Asegurar que no haya márgenes ni rellenos no deseados */
+.contact-page header {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+/* Estilo específico para el header de contacto */
+.header-contacto {
+    background: var(--background-color) !important;
+    color: #151515 !important;
+    padding: 0.7rem 0 !important;
+    margin: 0 !important;
+}
+
+.contact-section {
+    margin-top: 2rem;
+    margin-bottom: 4rem;
+}
+
+.contact-container {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.contact-form, .contact-info {
+    padding: 2.5rem;
+    flex: 1;
+    min-width: 300px;
+}
+
+.contact-form {
+    background: #fff;
+    border-right: 1px solid #eee;
+}
+
+.contact-form h2, .contact-info h3 {
+    color: #fff;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #555;
+}
+
+.form-control, .form-select {
+    border-radius: 5px;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    font-size: 0.95rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #0a16c5;
+    box-shadow: 0 0 0 0.25rem rgba(10, 22, 197, 0.1);
+}
+
+.btn-send {
+    background-color: #0a16c5;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.btn-send:hover {
+    background-color: #080f8c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.contact-info {
+    background-color: #0a16c5;
+    color: #fff;
+}
+
+.info-item {
+    display: flex;
+    margin-bottom: 1.5rem;
+    align-items: flex-start;
+}
+
+.info-icon {
+    background-color: #0a16c5;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.info-content h4 {
+    margin: 0 0 0.25rem 0;
+    color: #fff;
+    font-size: 1.05rem;
+}
+
+.info-content p, .info-content a {
+    margin: 0;
+    color: #e0e0e0;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.info-content a:hover {
+    color: #fff;
+    text-decoration: underline;
+    opacity: 0.9;
+}
+
+.map-container {
+    margin-top: 2rem;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.map-container iframe {
+    width: 100%;
+    height: 250px;
+    border: 0;
+}
+
+/* Estilos para validación */
+.was-validated .form-control:invalid,
+.was-validated .form-select:invalid,
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #dc3545;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.was-validated .form-control:valid,
+.was-validated .form-select:valid,
+.form-control.is-valid,
+.form-select.is-valid {
+    border-color: #198754;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+}
+
+.was-validated .form-control:invalid ~ .invalid-feedback,
+.was-validated .form-control:invalid ~ .invalid-tooltip,
+.was-validated .form-select:invalid ~ .invalid-feedback,
+.was-validated .form-select:invalid ~ .invalid-tooltip,
+.form-control.is-invalid ~ .invalid-feedback,
+.form-control.is-invalid ~ .invalid-tooltip,
+.form-select.is-invalid ~ .invalid-feedback,
+.form-select.is-invalid ~ .invalid-tooltip {
+    display: block;
+}
+
+/* Estilos responsivos */
+@media (max-width: 991.98px) {
+    .contact-container {
+        flex-direction: column;
+    }
+    
+    .contact-form {
+        border-right: none;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .contact-form, .contact-info {
+        padding: 2rem 1.5rem;
+    }
+}
+
+/* Estilos para el botón de WhatsApp */
+.whatsapp-float {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 40px;
+    right: 40px;
+    background-color: #25d366;
+    color: #FFF;
+    border-radius: 50px;
+    text-align: center;
+    font-size: 30px;
+    box-shadow: 2px 2px 3px #999;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.whatsapp-float:hover {
+    background-color: #128C7E;
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.whatsapp-float i {
+    margin-right: 0;
+}
+
+/* Estilos para mensajes de éxito/error */
+.alert {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+}
+
+.alert-success {
+    color: #0f5132;
+    background-color: #d1e7dd;
+    border-color: #badbcc;
+}
+
+/* Ajustes adicionales para el formulario */
+#contactForm {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Mejoras de accesibilidad */n:focus {
+    outline: 3px solid #0a16c5;
+    outline-offset: 2px;
+}
+
+/* Mejoras visuales para elementos interactivos */
+button, a, input, select, textarea {
+    transition: all 0.2s ease;
+}
+
+/* Ajustes para dispositivos móviles */
+@media (max-width: 575.98px) {
+    .whatsapp-float {
+        width: 50px;
+        height: 50px;
+        bottom: 30px;
+        right: 20px;
+        font-size: 25px;
+    }
+    
+    .contact-form, .contact-info {
+        padding: 1.5rem 1rem;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .info-icon {
+        margin-bottom: 0.5rem;
+    }
+}

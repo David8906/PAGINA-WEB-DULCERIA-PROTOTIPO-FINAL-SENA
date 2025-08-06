@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras - Distribuidora La Victoria</title>
+    
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="../assets/css/estilo.css">
+    
+    <style>
+        .cart-header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 2rem 0;
+        }
+        
+        .cart-item {
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+        
+        .cart-item:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .quantity-input {
+            max-width: 100px;
+        }
+        
+        .cart-summary {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .btn-checkout {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+            padding: 12px 30px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-checkout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        }
+        
+        .empty-cart {
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #28a745;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Cargar Componentes -->
+    <div id="header-container"></div>
+    <div id="navbar-container"></div>
+
+    <!-- Cart Header -->
+    <section class="cart-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="mb-0">
+                        <i class="fas fa-shopping-cart me-3"></i>
+                        Mi Carrito
+                    </h1>
+                    <p class="mb-0 mt-2">Revisa tus productos antes de finalizar tu compra</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="/" class="text-white">Inicio</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Carrito</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Content -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <!-- Cart Items -->
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header bg-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-list me-2 text-primary"></i>
+                                    Productos en tu carrito
+                                </h5>
+                                <button class="btn btn-outline-danger btn-sm" onclick="cart.clearCart()">
+                                    <i class="fas fa-trash me-1"></i>Vaciar carrito
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="cart-items-container">
+                                <!-- Los productos se cargarán aquí dinámicamente -->
+                                <div class="text-center py-5">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                    <p class="mt-3">Cargando carrito...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Continuar Comprando -->
+                    <div class="mt-4">
+                        <a href="../views/productos.html" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Continuar Comprando
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Cart Summary -->
+                <div class="col-lg-4">
+                    <div class="cart-summary sticky-top" style="top: 2rem;">
+                        <h5 class="mb-4">
+                            <i class="fas fa-calculator me-2 text-primary"></i>
+                            Resumen del Pedido
+                        </h5>
+                        
+                        <div class="summary-row d-flex justify-content-between mb-2">
+                            <span>Subtotal:</span>
+                            <span id="cart-subtotal">$0</span>
+                        </div>
+                        
+                        <div class="summary-row d-flex justify-content-between mb-2">
+                            <span>Envío:</span>
+                            <span class="text-success">Gratis</span>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="summary-row d-flex justify-content-between mb-4">
+                            <strong>Total:</strong>
+                            <strong class="text-primary fs-4" id="cart-total">$0</strong>
+                        </div>
+
+                        <!-- Checkout Button -->
+                        <button class="btn btn-checkout text-white w-100 mb-3" onclick="showCheckoutModal()">
+                            <i class="fas fa-credit-card me-2"></i>
+                            Proceder al Pago
+                        </button>
+
+                        <!-- Payment Methods -->
+                        <div class="text-center">
+                            <small class="text-muted d-block mb-2">Métodos de pago aceptados:</small>
+                            <div class="payment-methods">
+                                <i class="fab fa-cc-visa fa-2x text-primary me-2"></i>
+                                <i class="fab fa-cc-mastercard fa-2x text-danger me-2"></i>
+                                <i class="fas fa-mobile-alt fa-2x text-success me-2"></i>
+                                <i class="fas fa-money-bill-wave fa-2x text-warning"></i>
+                            </div>
+                        </div>
+
+                        <!-- Security Info -->
+                        <div class="mt-4 p-3 bg-light rounded">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-shield-alt text-success me-2"></i>
+                                <small>
+                                    <strong>Compra segura</strong><br>
+                                    Tus datos están protegidos con SSL
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Checkout Modal -->
+    <div class="modal fade" id="checkoutModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-credit-card me-2"></i>
+                        Finalizar Compra
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="checkoutForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-shipping-fast text-primary me-2"></i>
+                                    Información de Envío
+                                </h6>
+                                
+                                <div class="mb-3">
+                                    <label for="fullName" class="form-label">Nombre Completo</label>
+                                    <input type="text" class="form-control" id="fullName" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Teléfono</label>
+                                    <input type="tel" class="form-control" id="phone" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="address" class="form-label">Dirección Completa</label>
+                                    <textarea class="form-control" id="address" rows="3" required 
+                                              placeholder="Calle, número, barrio, ciudad"></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="notes" class="form-label">Notas del Pedido (Opcional)</label>
+                                    <textarea class="form-control" id="notes" rows="2" 
+                                              placeholder="Instrucciones especiales para la entrega"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-credit-card text-primary me-2"></i>
+                                    Método de Pago
+                                </h6>
+                                
+                                <div class="payment-options">
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="cash" value="cash" checked>
+                                        <label class="form-check-label" for="cash">
+                                            <i class="fas fa-money-bill-wave text-success me-2"></i>
+                                            Pago Contraentrega
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="transfer" value="transfer">
+                                        <label class="form-check-label" for="transfer">
+                                            <i class="fas fa-university text-primary me-2"></i>
+                                            Transferencia Bancaria
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="nequi" value="nequi">
+                                        <label class="form-check-label" for="nequi">
+                                            <i class="fas fa-mobile-alt text-success me-2"></i>
+                                            Nequi / Daviplata
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Order Summary in Modal -->
+                                <div class="order-summary mt-4 p-3 bg-light rounded">
+                                    <h6 class="mb-3">Resumen del Pedido</h6>
+                                    <div id="checkout-summary">
+                                        <!-- Se llenará dinámicamente -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="processCheckout()">
+                        <i class="fas fa-check me-2"></i>Confirmar Pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container container-footer">
+            <div class="menu-footer">
+                <div class="contact-info">
+                    <p class="title-footer">Información de Contacto</p>
+                    <ul>
+                        <li>Dirección: calle 105 b # 67-39</li>
+                        <li>Teléfono: (601)-778-56-71</li>
+                        <li>Fax: 778-56-71 opción (1)</li>
+                        <li>EmaiL: distribuidoradedulceslavictoria@gmail.com</li>
+                    </ul>
+                    <div class="social-icons">
+                        <span class="facebook"><i class="fa-brands fa-facebook-f"></i></span>
+                        <span class="twitter"><i class="fa-brands fa-twitter"></i></span>
+                        <span class="youtube"><i class="fa-brands fa-youtube"></i></span>
+                        <span class="pinterest"><i class="fa-brands fa-pinterest-p"></i></span>
+                        <span class="instagram"><i class="fa-brands fa-instagram"></i></span>
+                    </div>
+                </div>
+
+                <div class="information">
+                    <p class="title-footer">Información</p>
+                    <ul>
+                        <li><a href="#">Acerca de Nosotros</a></li>
+                        <li><a href="#">Información Domicilios</a></li>
+                        <li><a href="#">Politicas de Privacidad</a></li>
+                        <li><a href="#">Términos y condiciones</a></li>
+                        <li><a href="#">Contactános</a></li>
+                    </ul>
+                </div>
+
+                <div class="my-account">
+                    <p class="title-footer">Mi cuenta</p>
+                    <ul>
+                        <li><a href="#">Mi cuenta</a></li>
+                        <li><a href="#">Historial de ordenes</a></li>
+                        <li><a href="#">Lista de deseos</a></li>
+                        <li><a href="#">Boletín</a></li>
+                        <li><a href="#">Reembolsos</a></li>
+                    </ul>
+                </div>
+
+                <div class="newsletter">
+                    <p class="title-footer">Boletín informativo</p>
+                    <div class="content">
+                        <p>Suscríbete a nuestros boletines ahora y mantente al día con nuevas colecciones y ofertas exclusivas.</p>
+                        <input type="email" placeholder="Ingresa el correo aquí...">
+                        <button>Suscríbete</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>Desarrollado por: DISEÑO WEB DR &copy; 2024</p>
+                <img src="../assets/img/imagen/payment.png" alt="Pagos">
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/supabase-config.js"></script>
+    <script src="../assets/js/auth_manager.js"></script>
+    <script src="../assets/js/shopping-cart.js"></script>
+    <script src="../assets/js/script.js"></script>
+
+    <script>
+        // Configuración de rutas base
+        function navigateTo(path) {
+            window.location.href = path;
+        }
+        
+        // Función para cargar componentes
+        const loadComponent = (elementId, path) => {
+            return fetch(path)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById(elementId).innerHTML = html;
+                    return html;
+                })
+                .catch(error => {
+                    console.error('Error cargando componente:', error);
+                    return '';
+                });
+        };
+
+        // Funciones específicas del carrito
+        function showCheckoutModal() {
+            if (!window.cart.isUserLoggedIn()) {
+                window.cart.showLoginAlert();
+                return;
+            }
+
+            if (window.cart.cart.length === 0) {
+                window.cart.showNotification('Tu carrito está vacío', 'error');
+                return;
+            }
+
+            // Llenar información del usuario si está disponible
+            if (window.authManager && window.authManager.currentProfile) {
+                const profile = window.authManager.currentProfile;
+                document.getElementById('fullName').value = profile.nombre || '';
+            }
+
+            // Mostrar resumen en el modal
+            updateCheckoutSummary();
+
+            const modal = new bootstrap.Modal(document.getElementById('checkoutModal'));
+            modal.show();
+        }
+
+        function updateCheckoutSummary() {
+            const summaryContainer = document.getElementById('checkout-summary');
+            const cart = window.cart.getCart();
+
+            summaryContainer.innerHTML = `
+                <div class="checkout-items mb-3">
+                    ${cart.items.map(item => `
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small">${item.name} × ${item.quantity}</span>
+                            <span class="small fw-bold">$${(item.price * item.quantity).toLocaleString()}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <strong>Total:</strong>
+                    <strong class="text-primary">$${cart.total.toLocaleString()}</strong>
+                </div>
+            `;
+        }
+
+        async function processCheckout() {
+            const form = document.getElementById('checkoutForm');
+            const formData = new FormData(form);
+
+            const shippingData = {
+                fullName: document.getElementById('fullName').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                notes: document.getElementById('notes').value,
+                paymentMethod: document.querySelector('input[name="paymentMethod"]:checked').value
+            };
+
+            // Validar campos requeridos
+            if (!shippingData.fullName || !shippingData.phone || !shippingData.address) {
+                window.cart.showNotification('Por favor completa todos los campos requeridos', 'error');
+                return;
+            }
+
+            try {
+                // Mostrar loading
+                document.getElementById('loadingOverlay').style.display = 'flex';
+
+                const result = await window.cart.checkout(shippingData);
+
+                if (result.success) {
+                    // Cerrar modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('checkoutModal'));
+                    modal.hide();
+
+                    // Mostrar mensaje de éxito
+                    window.cart.showNotification(
+                        `¡Pedido ${result.orderNumber} creado exitosamente! Te contactaremos pronto.`,
+                        'success'
+                    );
+
+                    // Redirigir después de un momento
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 3000);
+                }
+
+            } catch (error) {
+                console.error('Error en checkout:', error);
+                window.cart.showNotification('Error al procesar el pedido: ' + error.message, 'error');
+            } finally {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        // Inicialización cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Inicializando página de carrito...');
+            
+            try {
+                // 1. Cargar componentes primero
+                await Promise.all([
+                    loadComponent('header-container', './components/header.html'),
+                    loadComponent('navbar-container', './components/navbar.html')
+                ]);
+                
+                console.log('✅ Componentes cargados');
+                
+                // 2. Esperar un poco para que los elementos se rendericen
+                setTimeout(async () => {
+                    // 3. Inicializar AuthManager
+                    if (window.authManager && !window.authManager.initialized) {
+                        await window.authManager.init();
+                        console.log('✅ AuthManager inicializado');
+                    }
+
+                    // 4. Esperar a que el carrito se inicialice y luego actualizar UI
+                    if (window.cart) {
+                        await window.cart.loadCartFromDB();
+                        window.cart.updateCartUI();
+                        
+                        // Actualizar también los totales en el resumen
+                        const cartData = window.cart.getCart();
+                        document.getElementById('cart-subtotal').textContent = `$${cartData.total.toLocaleString()}`;
+                        document.getElementById('cart-total').textContent = `$${cartData.total.toLocaleString()}`;
+                    }
+                    
+                    console.log('🎉 Página de carrito completamente inicializada');
+                }, 100);
+                
+            } catch (error) {
+                console.error('❌ Error al inicializar la página:', error);
+            }
+        });
+    </script>
+</body>
+</html>

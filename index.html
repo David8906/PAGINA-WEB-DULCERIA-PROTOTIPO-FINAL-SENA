@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distribuidora de Dulces La Victoria</title>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="frontend/assets/css/estilo.css">
+    <link rel="stylesheet" href="frontend/assets/css/gallery-5col.css">
+    <!-- Favicon -->
+    <link rel="icon" href="frontend/assets/img/imagen/mejora.png" type="image/png">
+</head>
+
+<body class="index-page">
+    <!-- Cargar Componentes -->
+    <div id="header-container"></div>
+    <div id="navbar-container"></div>
+    
+    <!-- Scripts de configuración - ORDEN IMPORTANTE -->
+    <script src="frontend/assets/js/supabase-config.js"></script>
+    <script src="frontend/assets/js/auth_manager.js"></script>
+    
+    <!-- Script básico para cargar componentes -->
+    <script>
+    // Configuración simple
+    window.BASE_PATH = '';
+    
+    function navigateTo(path) {
+        window.location.href = path;
+    }
+    
+    function loadComponent(elementId, path) {
+        return fetch(path)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById(elementId).innerHTML = html;
+                return html;
+            })
+            .catch(error => {
+                console.error('Error cargando componente:', error);
+                return '';
+            });
+    }
+
+    // Inicialización simple
+    document.addEventListener('DOMContentLoaded', async function() {
+        console.log('Cargando página...');
+        
+        try {
+            // Cargar componentes
+            await loadComponent('header-container', 'frontend/views/components/header.html');
+            await loadComponent('navbar-container', 'frontend/views/components/navbar.html');
+            
+            console.log('Componentes cargados');
+            
+            // Esperar un poco y luego inicializar AuthManager
+            setTimeout(async () => {
+                if (window.authManager && !window.authManager.initialized) {
+                    await window.authManager.init();
+                    console.log('AuthManager inicializado');
+                }
+            }, 200);
+            
+        } catch (error) {
+            console.error('Error al cargar:', error);
+        }
+    });
+    </script>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+
+	<a href="https://wa.me/573225769546?text=Bienvenido%20a%20la%20dulceria%20la%20victoria,%20en%20qu%C3%A9%20podemos%20servirte%20&send" class="whatsapp-float" target="_blank" title="¡Contáctanos por WhatsApp!">
+		<i class="fa-brands fa-whatsapp"></i> Escríbenos
+	</a>
+	
+	<section class="banner">
+		<div class="content-banner">
+			<p>LA FELICIDAD EN TODOS LOS SABORES, FORMAS Y TEXTURAS...</p>
+			<h2>DULCES PARA TI<br />Y TU NEGOCIO</h2>
+			<a href="#">Comprar ahora</a>
+		</div>
+	</section>
+
+	<section class="container container-features">
+		<div class="card-feature">
+			<i class="fa-solid fa-plane-up"></i>
+			<div class="feature-content">
+				<span>Envío a nivel nacional</span>
+				<p>En pedidos superiores a $50.000 COP</p>
+			</div>
+		</div>
+		<div class="card-feature">
+			<i class="fa-solid fa-wallet"></i>
+			<div class="feature-content">
+				<span>Reembolso</span>
+				<p>100% garantía de devolución de dinero (apican T Y C)</p>
+			</div>
+		</div>
+		<div class="card-feature">
+			<i class="fa-solid fa-gift"></i>
+			<div class="feature-content">
+				<span>Bono especial de bienvenida</span>
+				<p>Bonos especiales con regalo</p>
+			</div>
+		</div>
+		<div class="card-feature">
+			<i class="fa-solid fa-headset"></i>
+			<div class="feature-content">
+				<span>Servicio al cliente</span>
+				<p>LLámenos (57)+601 + 7785671</p>
+			</div>
+		</div>
+	</section>
+
+	<section class="container top-categories">
+		<h1 class="heading-1">Categorías</h1>
+		<div class="container-categories">
+			<div class="card-category category-moca">
+				<p>Dulcería</p>
+				<span>Ver más</span>
+			</div>
+			<div class="card-category category-expreso">
+				<p>Galletería</p>
+				<span>Ver más</span>
+			</div>
+			<div class="card-category category-capuchino">
+				<p>Chocolates</p>
+				<span>Ver más</span>
+			</div>
+		</div>
+	</section>
+
+	<section class="container top-products">
+		<h1 class="heading-1">Mejores Productos</h1>
+		
+		<!-- Filtros de navegación -->
+		<div class="container-options mb-4">
+			<span class="active">Destacados</span>
+			<span>Nuevos Productos</span>
+			<span>Más Vendidos</span>
+		</div>
+
+		<!-- Galería de productos - Versión móvil -->
+		<div class="d-flex flex-row overflow-auto gap-3 py-2 d-md-none">
+			<!-- Producto 1 -->
+			<div class="card-product" style="min-width: 200px;">
+				<div class="position-relative">
+					<img src="frontend/assets/img/imagen/gomitas-trululu-fresitas-por-90gr.jpg" class="rounded" style="height: 150px; width: 100%; object-fit: cover;" alt="Gomitas trululu">
+					<span class="badge bg-danger position-absolute top-0 end-0 m-2">-13%</span>
+				</div>
+				<div class="p-2">
+					<div class="text-warning mb-1">
+						<i class="fas fa-star"></i>
+						<i class="fas fa-star"></i>
+						<i class="fas fa-star"></i>
+						<i class="fas fa-star"></i>
+						<i class="far fa-star"></i>
+					</div>
+					<h6 class="mb-1">Gomitas Trululu X 90 gr</h6>
+					<div class="d-flex justify-content-between align-items-center">
+						<span class="fw-bold">$2.350</span>
+						<small class="text-muted text-decoration-line-through">$2.400</small>
+						<button class="btn btn-sm btn-outline-primary"><i class="fas fa-shopping-basket"></i></button>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Producto 2 -->
+			<div class="card-product" style="min-width: 200px;">
+				<div class="position-relative">
+					<img src="frontend/assets/img/imagen/galleta_oreo_12u_432gr_original_galletas_512x512.webp" class="rounded" style="height: 150px; width: 100%; object-fit: cover;" alt="Galletas Oreo">
+					<span class="badge bg-danger position-absolute top-0 end-0 m-2">-22%</span>
+				</div>
+				<div class="p-2">
+					<div class="text-warning mb-1">
+						<i class="fas fa-star"></i>
+						<i class="fas fa-star"></i>
+						<i class="fas fa-star"></i>
+						<i class="far fa-star"></i>
+						<i class="far fa-star"></i>
+					</div>
+					<h6 class="mb-1">Galletas Oreo x 12 UND</h6>
+					<div class="d-flex justify-content-between align-items-center">
+						<span class="fw-bold">$14.550</span>
+						<small class="text-muted text-decoration-line-through">$14.620</small>
+						<button class="btn btn-sm btn-outline-primary"><i class="fas fa-shopping-basket"></i></button>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Producto 3 -->
+			<div class="card-product" style="min-width: 200px;">
+				<div class="position-relative">
+					<img src="frontend/assets/img/imagen/jumbo-grande-en-caja-.jpg" class="rounded" style="height: 150px; width: 100%; object-fit: cover;" alt="Jumbo caja grande">
+				</div>
+				<div class="p-2">
+					<div class="text-warning mb-1">
+						<i class="fas fa-star"></i>
+						<i class="fas fa-star"></i>
+						<i class="fas fa-star"></i>
+						<i class="fas fa-star"></i>
+						<i class="fas fa-star"></i>
+					</div>
+					<h6 class="mb-1">Jumbo grande x 12 UND</h6>
+					<div class="d-flex justify-content-between align-items-center">
+						<span class="fw-bold">$69.000</span>
+						<button class="btn btn-sm btn-outline-primary"><i class="fas fa-shopping-basket"></i></button>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Producto 4 -->
+			<div class="card-product" style="min-width: 200px;">
+				<div class="position-relative">
+					<img src="frontend/assets/img/imagen/bonbonbum.webp" class="rounded" style="height: 150px; width: 100%; object-fit: cover;" alt="BonBonBum">
+				</div>
+				<div class="p-2">
+					<div class="text-warning mb-1">
+						<i class="fas fa-star"></i>
+						<i class="fas fa-star"></i>
+						<i class="fas fa-star"></i>
+						<i class="fas fa-star"></i>
+						<i class="far fa-star"></i>
+					</div>
+					<h6 class="mb-1">BonBonBum Rojo x 24 UND</h6>
+					<div class="d-flex justify-content-between align-items-center">
+						<span class="fw-bold">$9.300</span>
+						<button class="btn btn-sm btn-outline-primary"><i class="fas fa-shopping-basket"></i></button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Galería de productos - Versión escritorio -->
+		<div class="row g-4 d-none d-md-flex">
+			<!-- Producto 1 -->
+			<div class="col-md-3">
+				<div class="card h-100 border-0 shadow-sm">
+					<div class="position-relative">
+						<img src="frontend/assets/img/imagen/gomitas-trululu-fresitas-por-90gr.jpg" class="card-img-top" alt="Gomitas trululu" style="height: 200px; object-fit: cover;">
+						<span class="badge bg-danger position-absolute top-0 end-0 m-2">-13%</span>
+					</div>
+					<div class="card-body">
+						<div class="text-warning mb-2">
+							<i class="fas fa-star"></i>
+							<i class="fas fa-star"></i>
+							<i class="fas fa-star"></i>
+							<i class="fas fa-star"></i>
+							<i class="far fa-star"></i>
+						</div>
+						<h5 class="card-title">Gomitas Trululu X 90 gr</h5>
+						<div class="d-flex justify-content-between align-items-center mt-3">
+							<div>
+								<span class="h5 mb-0 fw-bold">$2.350</span>
+								<small class="text-muted text-decoration-line-through d-block">$2.400</small>
+							</div>
+							<button class="btn btn-primary rounded-circle p-2">
+								<i class="fas fa-shopping-basket"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Producto 2 -->
+			<div class="col-md-3">
+				<div class="card h-100 border-0 shadow-sm">
+					<div class="position-relative">
+						<img src="frontend/assets/img/imagen/galleta_oreo_12u_432gr_original_galletas_512x512.webp" class="card-img-top" alt="Galletas Oreo" style="height: 200px; object-fit: cover;">
+						<span class="badge bg-danger position-absolute top-0 end-0 m-2">-22%</span>
+					</div>
+					<div class="card-body">
+						<div class="text-warning mb-2">
+							<i class="fas fa-star"></i>
+							<i class="fas fa-star"></i>
+							<i class="fas fa-star"></i>
+							<i class="far fa-star"></i>
+							<i class="far fa-star"></i>
+						</div>
+						<h5 class="card-title">Galletas Oreo x 12 UND</h5>
+						<div class="d-flex justify-content-between align-items-center mt-3">
+							<div>
+								<span class="h5 mb-0 fw-bold">$14.550</span>
+								<small class="text-muted text-decoration-line-through d-block">$14.620</small>
+							</div>
+							<button class="btn btn-primary rounded-circle p-2">
+								<i class="fas fa-shopping-basket"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Producto 3 -->
+			<div class="col-md-3">
+				<div class="card h-100 border-0 shadow-sm">
+					<div class="position-relative">
+						<img src="frontend/assets/img/imagen/jumbo-grande-en-caja-.jpg" class="card-img-top" alt="Jumbo caja grande" style="height: 200px; object-fit: cover;">
+					</div>
+					<div class="card-body">
+						<div class="text-warning mb-2">
+							<i class="fas fa-star"></i>
+							<i class="fas fa-star"></i>
+							<i class="fas fa-star"></i>
+							<i class="fas fa-star"></i>
+							<i class="fas fa-star"></i>
+						</div>
+						<h5 class="card-title">Jumbo grande x 12 UND</h5>
+						<div class="d-flex justify-content-between align-items-center mt-3">
+							<div>
+								<span class="h5 mb-0 fw-bold">$69.000</span>
+							</div>
+							<button class="btn btn-primary rounded-circle p-2">
+								<i class="fas fa-shopping-basket"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Producto 4 -->
+			<div class="col-md-3">
+				<div class="card h-100 border-0 shadow-sm">
+					<div class="position-relative">
+						<img src="frontend/assets/img/imagen/bonbonbum.webp" class="card-img-top" alt="BonBonBum" style="height: 200px; object-fit: cover;">
+					</div>
+					<div class="card-body">
+						<div class="text-warning mb-2">
+							<i class="fas fa-star"></i>
+							<i class="fas fa-star"></i>
+							<i class="fas fa-star"></i>
+							<i class="fas fa-star"></i>
+							<i class="far fa-star"></i>
+						</div>
+						<h5 class="card-title">BonBonBum Rojo x 24 UND</h5>
+						<div class="d-flex justify-content-between align-items-center mt-3">
+							<div>
+								<span class="h5 mb-0 fw-bold">$9.300</span>
+							</div>
+							<button class="btn btn-primary rounded-circle p-2">
+								<i class="fas fa-shopping-basket"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Resto del contenido se mantiene igual... -->
+	<div class="gallery-wrapper">
+		<!-- Galería horizontal solo en móvil -->
+		<div class="d-flex flex-row overflow-auto gap-2 py-2 d-md-none">
+			<img src="frontend/assets/img/imagen/galeria imagen 1.jpg" alt="Galeria Img1" class="rounded" style="height: 130px; min-width: 130px; object-fit: cover;">
+			<img src="frontend/assets/img/imagen/galeria imagen 2.jpeg" alt="Galeria Img2" class="rounded" style="height: 130px; min-width: 130px; object-fit: cover;">
+			<img src="frontend/assets/img/imagen/galeria imagen 3.jpg" alt="Galeria Img3" class="rounded" style="height: 130px; min-width: 130px; object-fit: cover;">
+			<img src="frontend/assets/img/imagen/galeria imagen 4.jfif" alt="Galeria Img4" class="rounded" style="height: 130px; min-width: 130px; object-fit: cover;">
+			<img src="frontend/assets/img/imagen/galeria imagen 5.avif" alt="Galeria Img5" class="rounded" style="height: 130px; min-width: 130px; object-fit: cover;">
+		</div>
+		<!-- Galería grid 5 columnas solo en escritorio -->
+		<div class="gallery-5col d-none d-md-flex">
+			<div><img src="frontend/assets/img/imagen/galeria imagen 1.jpg" alt="Galeria Img1"></div>
+			<div><img src="frontend/assets/img/imagen/galeria imagen 2.jpeg" alt="Galeria Img2"></div>
+			<div><img src="frontend/assets/img/imagen/galeria imagen 3.jpg" alt="Galeria Img3"></div>
+			<div><img src="frontend/assets/img/imagen/galeria imagen 4.jfif" alt="Galeria Img4"></div>
+			<div><img src="frontend/assets/img/imagen/galeria imagen 5.avif" alt="Galeria Img5"></div>
+		</div>
+	</div>
+
+    </main>
+
+    <!-- Modales simples -->
+    <div id="loginModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Iniciar Sesión</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Correo electrónico</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Contraseña</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="registerModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Registrarse</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerName">Nombre completo</label>
+                    <input type="text" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Correo electrónico</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Contraseña (mínimo 8 caracteres)</label>
+                    <input type="password" id="registerPassword" minlength="8" required 
+                           oninput="validatePassword(this)"
+                           title="La contraseña debe tener al menos 8 caracteres">
+                    <small id="passwordHelp" class="text-danger" style="display:none;">La contraseña debe tener al menos 8 caracteres</small>
+                </div>
+                <button type="submit" class="btn btn-primary">Registrarse</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Estilos para modales -->
+    <style>
+    .modal {
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 90%;
+        max-width: 400px;
+        border-radius: 8px;
+        position: relative;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover {
+        color: black;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    .btn {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        width: 100%;
+    }
+
+    .btn-primary {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #45a049;
+    }
+    </style>
+
+    <footer class="footer">
+		<div class="container container-footer">
+			<div class="menu-footer">
+				<div class="contact-info">
+					<p class="title-footer">Información de Contacto</p>
+					<ul>
+						<li>Dirección: calle 105 b # 67-39</li>
+						<li>Teléfono: (601)-778-56-71</li>
+						<li>Fax: 778-56-71 opción (1)</li>
+						<li>EmaiL: distribuidoradedulceslavictoria@gmail.com</li>
+					</ul>
+					<div class="social-icons">
+						<span class="facebook"><i class="fa-brands fa-facebook-f"></i></span>
+						<span class="twitter"><i class="fa-brands fa-twitter"></i></span>
+						<span class="youtube"><i class="fa-brands fa-youtube"></i></span>
+						<span class="pinterest"><i class="fa-brands fa-pinterest-p"></i></span>
+						<span class="instagram"><i class="fa-brands fa-instagram"></i></span>
+					</div>
+				</div>
+
+				<div class="information">
+					<p class="title-footer">Información</p>
+					<ul>
+						<li><a href="#">Acerca de Nosotros</a></li>
+						<li><a href="#">Información Domicilios</a></li>
+						<li><a href="#">Politicas de Privacidad</a></li>
+						<li><a href="#">Términos y condiciones</a></li>
+						<li><a href="#">Contactános</a></li>
+					</ul>
+				</div>
+
+				<div class="my-account">
+					<p class="title-footer">Mi cuenta</p>
+					<ul>
+						<li><a href="#">Mi cuenta</a></li>
+						<li><a href="#">Historial de ordenes</a></li>
+						<li><a href="#">Lista de deseos</a></li>
+						<li><a href="#">Boletín</a></li>
+						<li><a href="#">Reembolsos</a></li>
+					</ul>
+				</div>
+
+				<div class="newsletter">
+					<p class="title-footer">Boletín informativo</p>
+					<div class="content">
+						<p>Suscríbete a nuestros boletines ahora y mantente al día con nuevas colecciones y ofertas exclusivas.</p>
+						<input type="email" placeholder="Ingresa el correo aquí...">
+						<button>Suscríbete</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="copyright">
+				<p>Desarrollado por: DISEÑO WEB DR &copy; 2024</p>
+				<img src="frontend/img/imagen/chat en linea.jpg" alt="Pagos">
+			</div>
+		</div>
+	</footer>
+
+	    <!-- Scripts principales -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/81581fb069.js" crossorigin="anonymous"></script>
+    
+    <script>
+    // Función para validar la contraseña en tiempo real
+    function validatePassword(input) {
+        const passwordHelp = document.getElementById('passwordHelp');
+        if (input.value.length > 0 && input.value.length < 8) {
+            passwordHelp.style.display = 'block';
+            input.setCustomValidity('La contraseña debe tener al menos 8 caracteres');
+        } else {
+            passwordHelp.style.display = 'none';
+            input.setCustomValidity('');
+        }
+    }
+    
+    // Validar el formulario de registro antes de enviar
+    document.addEventListener('DOMContentLoaded', function() {
+        const registerForm = document.getElementById('registerForm');
+        if (registerForm) {
+            registerForm.addEventListener('submit', function(e) {
+                const password = document.getElementById('registerPassword').value;
+                if (password.length < 8) {
+                    e.preventDefault();
+                    document.getElementById('passwordHelp').style.display = 'block';
+                    return false;
+                }
+                return true;
+            });
+        }
+    });
+    </script>
+    
+    <!-- Script personalizado simple -->
+    <script src="frontend/assets/js/script.js"></script>
+    
+    <!-- Manejadores de formularios simples -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Login form
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                if (window.authManager) {
+                    try {
+                        const result = await window.authManager.login(email, password);
+                        if (result.success) {
+                            document.getElementById('loginModal').style.display = 'none';
+                            console.log('Login exitoso');
+                        } else {
+                            alert('Error: ' + result.error);
+                        }
+                    } catch (error) {
+                        alert('Error al iniciar sesión');
+                        console.error(error);
+                    }
+                }
+            });
+        }
+        
+        // Register form
+        const registerForm = document.getElementById('registerForm');
+        if (registerForm) {
+            registerForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const name = document.getElementById('registerName').value;
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                
+                if (window.authManager) {
+                    try {
+                        const result = await window.authManager.register(name, email, password);
+                        if (result.success) {
+                            document.getElementById('registerModal').style.display = 'none';
+                            alert('¡Registro exitoso!');
+                        } else {
+                            alert('Error: ' + result.error);
+                        }
+                    } catch (error) {
+                        alert('Error al registrarse');
+                        console.error(error);
+                    }
+                }
+            });
+        }
+    });
+    </script>
+</body>
+</html>

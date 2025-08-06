@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - Distribuidora de Dulces La Victoria</title>
+    
+    <!-- SCRIPTS REQUERIDOS EN ESTE ORDEN -->
+    <!-- 1. Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- 2. Bootstrap y Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- 3. Estilos personalizados -->
+    <link rel="stylesheet" href="../assets/css/estilo.css" />
+    
+    <!-- 4. jQuery y Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <style>
+        .profile-card {
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+        
+        .profile-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid white;
+            margin: 0 auto 1rem;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--primary-color);
+        }
+        
+        .profile-body {
+            padding: 2rem;
+        }
+        
+        .form-section {
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .profile-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 0.5rem;
+        }
+        
+        .profile-value {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn-save {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 0.5rem 2rem;
+        }
+        
+        .btn-save:hover {
+            background-color: #268116;
+        }
+        
+        .password-toggle {
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        
+        .password-field {
+            position: relative;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Cargar Componentes -->
+    <div id="header-container"></div>
+    <div id="navbar-container"></div>
+
+    <main class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="profile-card bg-white">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h2 id="userFullName">Cargando...</h2>
+                        <p class="mb-0" id="userEmail">cargando@ejemplo.com</p>
+                    </div>
+                    
+                    <div class="profile-body">
+                        <!-- Sección de Información del Perfil -->
+                        <div class="form-section">
+                            <h4 class="mb-4"><i class="fas fa-user-circle me-2"></i>Información del Perfil</h4>
+                            
+                            <div class="mb-3">
+                                <label class="profile-label">Nombre Completo</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="inputFullName" placeholder="Ingresa tu nombre completo">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="profile-label">Correo Electrónico</label>
+                                <div class="input-group">
+                                    <input type="email" class="form-control" id="inputEmail" readonly>
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                </div>
+                                <small class="text-muted">El correo electrónico no puede ser modificado</small>
+                            </div>
+                            
+                            <button type="button" class="btn btn-save text-white" id="saveProfileBtn">
+                                <i class="fas fa-save me-2"></i>Guardar Cambios
+                            </button>
+                        </div>
+                        
+                        <!-- Sección de Cambio de Contraseña -->
+                        <div class="form-section">
+                            <h4 class="mb-4"><i class="fas fa-key me-2"></i>Cambiar Contraseña</h4>
+                            
+                            <div class="mb-3">
+                                <label class="profile-label">Contraseña Actual</label>
+                                <div class="password-field">
+                                    <input type="password" class="form-control" id="currentPassword" placeholder="Ingresa tu contraseña actual">
+                                    <i class="fas fa-eye-slash password-toggle" onclick="togglePassword('currentPassword')"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="profile-label">Nueva Contraseña</label>
+                                <div class="password-field">
+                                    <input type="password" class="form-control" id="newPassword" placeholder="Ingresa tu nueva contraseña">
+                                    <i class="fas fa-eye-slash password-toggle" onclick="togglePassword('newPassword')"></i>
+                                </div>
+                                <small class="text-muted">Mínimo 8 caracteres</small>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="profile-label">Confirmar Nueva Contraseña</label>
+                                <div class="password-field">
+                                    <input type="password" class="form-control" id="confirmPassword" placeholder="Confirma tu nueva contraseña">
+                                    <i class="fas fa-eye-slash password-toggle" onclick="togglePassword('confirmPassword')"></i>
+                                </div>
+                            </div>
+                            
+                            <button type="button" class="btn btn-save text-white" id="changePasswordBtn">
+                                <i class="fas fa-key me-2"></i>Cambiar Contraseña
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container container-footer">
+            <div class="menu-footer">
+                <div class="contact-info">
+                    <p class="title-footer">Información de Contacto</p>
+                    <ul>
+                        <li>Dirección: calle 105 b # 67-39</li>
+                        <li>Teléfono: (601)-778-56-71</li>
+                        <li>Fax: 778-56-71 opción (1)</li>
+                        <li>EmaiL: distribuidoradedulceslavictoria@gmail.com</li>
+                    </ul>
+                    <div class="social-icons">
+                        <span class="facebook"><i class="fa-brands fa-facebook-f"></i></span>
+                        <span class="twitter"><i class="fa-brands fa-twitter"></i></span>
+                        <span class="youtube"><i class="fa-brands fa-youtube"></i></span>
+                        <span class="pinterest"><i class="fa-brands fa-pinterest-p"></i></span>
+                        <span class="instagram"><i class="fa-brands fa-instagram"></i></span>
+                    </div>
+                </div>
+
+                <div class="information">
+                    <p class="title-footer">Información</p>
+                    <ul>
+                        <li><a href="#">Acerca de Nosotros</a></li>
+                        <li><a href="#">Información Domicilios</a></li>
+                        <li><a href="#">Politicas de Privacidad</a></li>
+                        <li><a href="#">Términos y condiciones</a></li>
+                        <li><a href="#">Contactános</a></li>
+                    </ul>
+                </div>
+
+                <div class="my-account">
+                    <p class="title-footer">Mi cuenta</p>
+                    <ul>
+                        <li><a href="#">Mi cuenta</a></li>
+                        <li><a href="#">Historial de ordenes</a></li>
+                        <li><a href="#">Lista de deseos</a></li>
+                        <li><a href="#">Boletín</a></li>
+                        <li><a href="#">Reembolsos</a></li>
+                    </ul>
+                </div>
+
+                <div class="newsletter">
+                    <p class="title-footer">Boletín informativo</p>
+                    <div class="content">
+                        <p>Suscríbete a nuestros boletines ahora y mantente al día con nuevas colecciones y ofertas exclusivas.</p>
+                        <input type="email" placeholder="Ingresa el correo aquí...">
+                        <button>Suscríbete</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>Desarrollado por: DISEÑO WEB DR &copy; 2024</p>
+                <img src="../assets/img/imagen/payment.png" alt="Pagos">
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS DE AUTENTICACIÓN - ORDEN CRÍTICO -->
+    <script src="../assets/js/supabase-config.js"></script>
+    <script src="../assets/js/auth_manager.js"></script>
+    <script src="../assets/js/script.js"></script>
+
+    <!-- Script específico de la página de perfil -->
+    <script>
+        // Función para alternar la visibilidad de la contraseña
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = field.nextElementSibling;
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                field.type = 'password';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        }
+        
+        // Función para mostrar notificaciones
+        function showNotification(message, type = 'success') {
+            // Crear el elemento de notificación
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '9999';
+            notification.style.minWidth = '300px';
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            // Agregar al documento
+            document.body.appendChild(notification);
+            
+            // Desaparecer después de 5 segundos
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 150);
+            }, 5000);
+        }
+        
+        // Cargar datos del perfil
+        async function loadProfile() {
+            try {
+                // Verificar si el usuario está autenticado
+                const { data: { user }, error } = await supabase.auth.getUser();
+                
+                if (error) throw error;
+                if (!user) {
+                    // Redirigir al login si no está autenticado
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // Mostrar información del usuario
+                document.getElementById('userFullName').textContent = user.user_metadata?.full_name || 'Usuario';
+                document.getElementById('userEmail').textContent = user.email;
+                
+                // Llenar los campos del formulario
+                document.getElementById('inputFullName').value = user.user_metadata?.full_name || '';
+                document.getElementById('inputEmail').value = user.email;
+                
+            } catch (error) {
+                console.error('Error al cargar el perfil:', error);
+                showNotification('Error al cargar el perfil. Intenta de nuevo.', 'danger');
+            }
+        }
+        
+        // Guardar cambios del perfil
+        async function saveProfile() {
+            const fullName = document.getElementById('inputFullName').value.trim();
+            
+            // Validaciones básicas
+            if (!fullName) {
+                showNotification('Por favor ingresa tu nombre completo', 'warning');
+                return;
+            }
+            
+            try {
+                // Actualizar solo el nombre en Supabase Auth
+                const { data, error } = await supabase.auth.updateUser({
+                    data: { full_name: fullName }
+                    // No se actualiza el correo electrónico
+                });
+                
+                if (error) throw error;
+                
+                // Actualizar la UI
+                document.getElementById('userFullName').textContent = fullName;
+                
+                showNotification('Perfil actualizado correctamente');
+                
+            } catch (error) {
+                console.error('Error al actualizar el perfil:', error);
+                showNotification('Error al actualizar el perfil: ' + error.message, 'danger');
+            }
+        }
+        
+        // Cambiar contraseña
+        async function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validaciones
+            if (!currentPassword) {
+                showNotification('Por favor ingresa tu contraseña actual', 'warning');
+                return;
+            }
+            
+            if (newPassword.length < 8) {
+                showNotification('La nueva contraseña debe tener al menos 8 caracteres', 'warning');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showNotification('Las contraseñas no coinciden', 'warning');
+                return;
+            }
+            
+            try {
+                // Verificar la contraseña actual (esto es un ejemplo, en producción necesitarías implementar esto de manera segura)
+                // NOTA: En una aplicación real, deberías tener un endpoint en tu backend para verificar la contraseña actual
+                // antes de permitir el cambio. Este es solo un ejemplo básico.
+                
+                // Actualizar la contraseña
+                const { data, error } = await supabase.auth.updateUser({
+                    password: newPassword
+                });
+                
+                if (error) throw error;
+                
+                // Limpiar los campos
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+                
+                showNotification('Contraseña actualizada correctamente');
+                
+            } catch (error) {
+                console.error('Error al cambiar la contraseña:', error);
+                showNotification('Error al cambiar la contraseña: ' + error.message, 'danger');
+            }
+        }
+        
+        // Inicialización cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Inicializando página de perfil...');
+            
+            try {
+                // 1. Cargar componentes primero
+                await Promise.all([
+                    loadComponent('header-container', './components/header.html'),
+                    loadComponent('navbar-container', './components/navbar.html')
+                ]);
+                
+                console.log('✅ Componentes cargados');
+                
+                // 2. Inicializar AuthManager si no está inicializado
+                if (window.authManager && !window.authManager.initialized) {
+                    await window.authManager.init();
+                    console.log('✅ AuthManager inicializado');
+                }
+                
+                // 3. Cargar datos del perfil
+                await loadProfile();
+                
+                // 4. Configurar manejadores de eventos
+                document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
+                document.getElementById('changePasswordBtn').addEventListener('click', changePassword);
+                
+                // 5. Marcar enlace activo en navbar
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    const href = link.getAttribute('onclick');
+                    if (href && href.includes('perfil.html')) {
+                        link.classList.add('active');
+                        link.style.color = 'var(--primary-color)';
+                        link.style.background = '#fff';
+                    } else {
+                        link.classList.remove('active');
+                        link.style.color = '#fff';
+                        link.style.background = 'transparent';
+                    }
+                });
+                
+                console.log('🎉 Página de perfil completamente inicializada');
+                
+            } catch (error) {
+                console.error('❌ Error al inicializar la página de perfil:', error);
+                showNotification('Error al cargar la página de perfil', 'danger');
+            }
+        });
+        
+        // Función para cargar componentes
+        async function loadComponent(elementId, path) {
+            try {
+                const response = await fetch(path);
+                if (!response.ok) throw new Error('Error al cargar el componente');
+                const html = await response.text();
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.innerHTML = html;
+                }
+                return html;
+            } catch (error) {
+                console.error(`Error cargando componente ${path}:`, error);
+                return '';
+            }
+        }
+    </script>
+</body>
+</html>

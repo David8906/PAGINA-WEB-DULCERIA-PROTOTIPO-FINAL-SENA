@@ -1,0 +1,35 @@
+RewriteEngine On
+
+# Configuración base dinámica
+RewriteCond %{REQUEST_URI}::%{ENV:REWRITE_BASE} ^(.*?)::$
+RewriteRule ^ - [E=REWRITE_BASE:%1]
+
+# Habilitar CORS para peticiones de la API
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+
+# Manejar solicitudes OPTIONS (preflight)
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ $1 [R=200,L]
+
+# Redireccionar la raíz al index.html
+RewriteRule ^$ index.html [L]
+
+# Manejar rutas de la API
+RewriteRule ^api/(.*)$ Backend/api.php?url=$1 [QSA,L]
+
+# Si el archivo o directorio solicitado existe, servirlo directamente
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Redirigir las rutas directas a frontend/views
+RewriteRule ^([^/]+)\.html$ frontend/views/$1.html [L]
+
+# Manejar rutas de recursos (CSS, JS, imágenes)
+RewriteCond %{REQUEST_URI} !^/PROYECTO2/frontend/
+RewriteRule ^(.*\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot))$ frontend/$1 [L,NC]
+
+# Redirigir todo lo demás al index.html para manejar rutas del frontend
+RewriteRule ^ index.html [L]

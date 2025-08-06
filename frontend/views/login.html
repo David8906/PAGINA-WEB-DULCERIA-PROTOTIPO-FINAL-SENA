@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iniciar Sesión - Distribuidora de Dulces La Victoria</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="../assets/css/estilo.css" />
+    <link rel="stylesheet" href="../assets/css/gallery-5col.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Incluir Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase-config.js"></script>
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #f8f9fa;
+        }
+        .main-content {
+            flex: 1;
+            padding: 2rem 0;
+            display: flex;
+            align-items: center;
+        }
+        .login-container {
+            max-width: 400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            background: white;
+        }
+        .login-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .login-logo img {
+            max-width: 150px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="index-page">
+    <!-- Cargar Componentes -->
+    <div id="header-container"></div>
+    <div id="navbar-container"></div>
+    
+    <div class="main-content">
+        <div class="container">
+            <div class="login-container">
+                <div class="login-logo text-center mb-3">
+                    <img src="../assets/img/imagen/mejora.png" alt="Logo" style="width: 100px; margin-top: -20px;">
+                    <h2 class="mt-1">Iniciar Sesión</h2>
+                </div>
+                
+                <form id="loginForm" class="needs-validation" novalidate>
+                    <div id="loginAlert" class="alert d-none" role="alert"></div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Correo electrónico</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                        <div class="invalid-feedback">
+                            Por favor ingresa un correo electrónico válido.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" name="password" required>
+                            <button class="btn btn-outline-secondary toggle-password" type="button">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback">
+                            Por favor ingresa tu contraseña.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMe">
+                        <label class="form-check-label" for="rememberMe">Recordar sesión</label>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mb-3">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="btn-text">Iniciar Sesión</span>
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    
+                    <div class="text-center">
+                        <p class="mb-2">¿No tienes una cuenta? <a href="registro.html">Regístrate aquí</a></p>
+                        <p class="mb-0"><a href="recuperar_contrasena.html" class="text-muted">¿Olvidaste tu contraseña?</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+    // Configuración de rutas base
+    window.basePath = '';
+    
+    // Función para navegar a una ruta (disponible globalmente)
+    window.navigateTo = function(path) {
+        window.location.href = `${window.basePath}${path}`;
+    };
+    
+    // Función para cargar componentes
+    const loadComponent = (elementId, path) => {
+        return fetch(path)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById(elementId).innerHTML = html;
+                return html;
+            });
+    };
+
+    // Función para inicializar componentes de Bootstrap
+    function initializeBootstrapComponents() {
+        // Inicializar tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Inicializar dropdowns
+        var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+        dropdownElementList.forEach(function (dropdownToggleEl) {
+            // Eliminar cualquier instancia previa
+            var existingDropdown = bootstrap.Dropdown.getInstance(dropdownToggleEl);
+            if (existingDropdown) {
+                existingDropdown.dispose();
+            }
+            
+            // Configurar atributos necesarios
+            dropdownToggleEl.setAttribute('data-bs-toggle', 'dropdown');
+            dropdownToggleEl.setAttribute('aria-expanded', 'false');
+            
+            // Crear nueva instancia
+            var dropdown = new bootstrap.Dropdown(dropdownToggleEl);
+            
+            // Manejar clics manualmente para asegurar la navegación
+            dropdownToggleEl.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropdown.toggle();
+            });
+        });
+    }
+
+    // Función para mostrar mensajes de error
+    function showAlert(message, type = 'danger') {
+        const alertDiv = document.getElementById('loginAlert');
+        alertDiv.textContent = message;
+        alertDiv.className = `alert alert-${type} mt-3`;
+        alertDiv.classList.remove('d-none');
+        
+        // Desplazarse al mensaje de error
+        alertDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Mostrar/ocultar contraseña
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.toggle-password')) {
+            const button = e.target.closest('.toggle-password');
+            const icon = button.querySelector('i');
+            const passwordInput = button.closest('.input-group').querySelector('input');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    });
+
+    // Función para mostrar mensajes de error
+    function showAlert(message, type = 'danger') {
+        const alertDiv = document.getElementById('loginAlert');
+        alertDiv.textContent = message;
+        alertDiv.className = `alert alert-${type} mt-3`;
+        alertDiv.classList.remove('d-none');
+        
+        // Desplazarse al mensaje de error
+        alertDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Manejar el envío del formulario de inicio de sesión
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Obtener elementos del DOM
+        const form = this;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const spinner = submitBtn.querySelector('.spinner-border');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const rememberMe = document.getElementById('rememberMe');
+        
+        // Ocultar mensajes de error previos
+        const alertDiv = document.getElementById('loginAlert');
+        alertDiv.classList.add('d-none');
+        
+        // Mostrar indicador de carga
+        submitBtn.disabled = true;
+        btnText.textContent = 'Iniciando sesión...';
+        spinner.classList.remove('d-none');
+        
+        try {
+            // Validar campos requeridos
+            if (!emailInput.value || !passwordInput.value) {
+                throw new Error('Por favor completa todos los campos requeridos.');
+            }
+            
+            // Validar formato de correo
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value)) {
+                throw new Error('Por favor ingresa un correo electrónico válido.');
+            }
+            
+            console.log('Iniciando sesión con:', emailInput.value);
+            
+            // 1. Autenticar con Supabase
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: emailInput.value.trim().toLowerCase(),
+                password: passwordInput.value
+            });
+
+            if (error) {
+                console.error('Error de autenticación:', error);
+                
+                // Manejar diferentes tipos de errores
+                if (error.message.includes('Invalid login credentials')) {
+                    throw new Error('Correo o contraseña incorrectos.');
+                } else if (error.message.includes('Email not confirmed')) {
+                    throw new Error('Por favor verifica tu correo electrónico antes de iniciar sesión.');
+                } else {
+                    throw new Error('Error al iniciar sesión. Por favor, intenta de nuevo.');
+                }
+            }
+
+            console.log('Autenticación exitosa:', data);
+            
+            // 2. Guardar preferencias de sesión
+            if (rememberMe.checked) {
+                localStorage.setItem('userEmail', emailInput.value);
+                // Configurar persistencia de sesión
+                const { error: sessionError } = await supabase.auth.setSession({
+                    access_token: data.session.access_token,
+                    refresh_token: data.session.refresh_token
+                });
+                
+                if (sessionError) {
+                    console.error('Error al guardar sesión:', sessionError);
+                }
+            } else {
+                localStorage.removeItem('userEmail');
+            }
+
+            // Mostrar mensaje de éxito
+            showAlert('¡Inicio de sesión exitoso! Redirigiendo...', 'success');
+            
+            // Redirigir después de 1.5 segundos
+            setTimeout(() => {
+                window.location.href = `${window.basePath || ''}/index.html`;
+            }, 1500);
+            
+        } catch (error) {
+            console.error('Error en el inicio de sesión:', error);
+            showAlert(error.message || 'Error al iniciar sesión. Por favor, verifica tus datos.', 'danger');
+        } finally {
+            // Restaurar botón
+            submitBtn.disabled = false;
+            btnText.textContent = 'Iniciar Sesión';
+            spinner.classList.add('d-none');
+        }
+    });
+
+    // Cargar header y navbar
+    document.addEventListener('DOMContentLoaded', function() {
+        // Cargar email guardado si existe
+        const savedEmail = localStorage.getItem('userEmail');
+        if (savedEmail) {
+            document.getElementById('email').value = savedEmail;
+            document.getElementById('rememberMe').checked = true;
+        }
+        
+        Promise.all([
+            loadComponent('header-container', './components/header.html'),
+            loadComponent('navbar-container', './components/navbar.html')
+        ]).then(() => {
+            // Inicializar componentes de Bootstrap
+            initializeBootstrapComponents();
+            
+            // Volver a inicializar después de un pequeño retraso para asegurar que todo esté listo
+            setTimeout(initializeBootstrapComponents, 100);
+        }).catch(error => {
+            console.error('Error al cargar componentes:', error);
+        });
+
+        // Validación de formulario
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    });
+    </script>
+</body>
+</html>

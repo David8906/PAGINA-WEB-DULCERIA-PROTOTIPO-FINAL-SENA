@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos - Distribuidora de Dulces La Victoria</title>
+    
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="../assets/css/estilo.css">
+    
+    <style>
+        .products-header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 2rem 0;
+        }
+        
+        .filter-section {
+            background: #f8f9fa;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .product-card {
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .product-image {
+            height: 220px;
+            background-color: #fff8f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-image img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+            padding: 1rem;
+        }
+        
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 2;
+        }
+        
+        .product-actions {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .product-card:hover .product-actions {
+            opacity: 1;
+        }
+        
+        .btn-add-cart {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-add-cart:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        }
+        
+        .price-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: auto;
+        }
+        
+        .price-current {
+            color: #28a745;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        
+        .price-original {
+            color: #6c757d;
+            text-decoration: line-through;
+            font-size: 0.9rem;
+        }
+        
+        .stock-info {
+            font-size: 0.85rem;
+        }
+        
+        .loading-products {
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .filter-btn {
+            border-radius: 25px;
+            padding: 8px 16px;
+            margin: 0 5px 10px 0;
+            border: 2px solid #28a745;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn.active {
+            background: #28a745;
+            color: white;
+        }
+        
+        .search-box {
+            border-radius: 25px;
+            border: 2px solid #e9ecef;
+            padding: 12px 20px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .search-box:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        }
+        
+        .sort-select {
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .pagination-container {
+            margin-top: 3rem;
+        }
+        
+        .no-products {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+        
+        .whatsapp-float {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 40px;
+            right: 40px;
+            background-color: #25d366;
+            color: #FFF;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 30px;
+            box-shadow: 2px 2px 3px #999;
+            z-index: 100;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .whatsapp-float:hover {
+            background-color: #20ba5a;
+            color: #FFF;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Cargar Componentes -->
+    <div id="header-container"></div>
+    <div id="navbar-container"></div>
+
+    <!-- WhatsApp Float -->
+    <a href="https://wa.me/573209663355" class="whatsapp-float" target="_blank" title="¡Contáctanos por WhatsApp!">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Products Header -->
+    <section class="products-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="mb-0">
+                        <i class="fas fa-store me-3"></i>
+                        Nuestros Productos
+                    </h1>
+                    <p class="mb-0 mt-2">Encuentra los mejores dulces, chocolates y galletas</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="/" class="text-white">Inicio</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Productos</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filters Section -->
+    <section class="filter-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="d-flex flex-wrap align-items-center">
+                        <label class="me-3 fw-bold">Filtrar por:</label>
+                        <button class="btn filter-btn active" data-category="" onclick="filterByCategory('')">
+                            Todos
+                        </button>
+                        <button class="btn filter-btn" data-category="chocolates" onclick="filterByCategory('chocolates')">
+                            Chocolates
+                        </button>
+                        <button class="btn filter-btn" data-category="dulceria" onclick="filterByCategory('dulceria')">
+                            Dulcería
+                        </button>
+                        <button class="btn filter-btn" data-category="galleteria" onclick="filterByCategory('galleteria')">
+                            Galletería
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <input type="text" class="form-control search-box" id="searchInput" 
+                                   placeholder="Buscar productos..." onkeyup="searchProducts()">
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-control sort-select" id="sortSelect" onchange="sortProducts()">
+                                <option value="nombre">Ordenar por Nombre</option>
+                                <option value="precio_asc">Precio: Menor a Mayor</option>
+                                <option value="precio_desc">Precio: Mayor a Menor</option>
+                                <option value="newest">Más Recientes</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Grid -->
+    <section class="py-5">
+        <div class="container">
+            <!-- Products Counter -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p class="mb-0 text-muted" id="productsCounter">
+                            <i class="fas fa-box me-2"></i>Cargando productos...
+                        </p>
+                        <div class="d-flex align-items-center">
+                            <label class="me-2">Mostrar:</label>
+                            <select class="form-control" style="width: auto;" id="itemsPerPage" onchange="changeItemsPerPage()">
+                                <option value="12">12 por página</option>
+                                <option value="24">24 por página</option>
+                                <option value="48">48 por página</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Container -->
+            <div id="productsContainer">
+                <div class="loading-products">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p>Cargando productos...</p>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container">
+                <nav aria-label="Paginación de productos">
+                    <ul class="pagination justify-content-center" id="pagination">
+                        <!-- Se generará dinámicamente -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container container-footer">
+            <div class="menu-footer">
+                <div class="contact-info">
+                    <p class="title-footer">Información de Contacto</p>
+                    <ul>
+                        <li>Dirección: calle 105 b # 67-39</li>
+                        <li>Teléfono: (601)-778-56-71</li>
+                        <li>Fax: 778-56-71 opción (1)</li>
+                        <li>EmaiL: distribuidoradedulceslavictoria@gmail.com</li>
+                    </ul>
+                    <div class="social-icons">
+                        <span class="facebook"><i class="fa-brands fa-facebook-f"></i></span>
+                        <span class="twitter"><i class="fa-brands fa-twitter"></i></span>
+                        <span class="youtube"><i class="fa-brands fa-youtube"></i></span>
+                        <span class="pinterest"><i class="fa-brands fa-pinterest-p"></i></span>
+                        <span class="instagram"><i class="fa-brands fa-instagram"></i></span>
+                    </div>
+                </div>
+
+                <div class="information">
+                    <p class="title-footer">Información</p>
+                    <ul>
+                        <li><a href="#">Acerca de Nosotros</a></li>
+                        <li><a href="#">Información Domicilios</a></li>
+                        <li><a href="#">Politicas de Privacidad</a></li>
+                        <li><a href="#">Términos y condiciones</a></li>
+                        <li><a href="#">Contactános</a></li>
+                    </ul>
+                </div>
+
+                <div class="my-account">
+                    <p class="title-footer">Mi cuenta</p>
+                    <ul>
+                        <li><a href="#">Mi cuenta</a></li>
+                        <li><a href="#">Historial de ordenes</a></li>
+                        <li><a href="#">Lista de deseos</a></li>
+                        <li><a href="#">Boletín</a></li>
+                        <li><a href="#">Reembolsos</a></li>
+                    </ul>
+                </div>
+
+                <div class="newsletter">
+                    <p class="title-footer">Boletín informativo</p>
+                    <div class="content">
+                        <p>Suscríbete a nuestros boletines ahora y mantente al día con nuevas colecciones y ofertas exclusivas.</p>
+                        <input type="email" placeholder="Ingresa el correo aquí...">
+                        <button>Suscríbete</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>Desarrollado por: DISEÑO WEB DR &copy; 2024</p>
+                <img src="../assets/img/imagen/payment.png" alt="Pagos">
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/supabase-config.js"></script>
+    <script src="../assets/js/auth_manager.js"></script>
+    <script src="../assets/js/shopping-cart.js"></script>
+    <script src="../assets/js/script.js"></script>
+
+    <script>
+        // Variables globales
+        let allProducts = [];
+        let filteredProducts = [];
+        let currentPage = 1;
+        let itemsPerPage = 12;
+        let currentCategory = '';
+        let currentSort = 'nombre';
+        let searchTerm = '';
+
+        // Función para cargar componentes
+        const loadComponent = (elementId, path) => {
+            return fetch(path)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById(elementId).innerHTML = html;
+                    return html;
+                })
+                .catch(error => {
+                    console.error('Error cargando componente:', error);
+                    return '';
+                });
+        };
+
+        // Cargar productos desde la base de datos - CORREGIDO PARA USAR 'productos'
+        async function loadProducts() {
+            try {
+                console.log('🔍 Cargando productos desde tabla "productos"...');
+                
+                const { data: products, error } = await supabase
+                    .from('productos')  // ✅ CAMBIADO DE 'products' A 'productos'
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('❌ Error cargando productos:', error);
+                    throw error;
+                }
+
+                console.log(`✅ ${products?.length || 0} productos cargados desde la base de datos`);
+                console.log('📋 Muestra de productos:', products?.[0]);
+
+                allProducts = products || [];
+                filteredProducts = [...allProducts];
+                
+                applyFiltersAndSort();
+                displayProducts();
+                updateCounter();
+
+            } catch (error) {
+                console.error('❌ Error cargando productos:', error);
+                displayError();
+            }
+        }
+
+        // Aplicar filtros y ordenamiento - ADAPTADO A ESTRUCTURA ESPAÑOLA
+        function applyFiltersAndSort() {
+            filteredProducts = allProducts.filter(product => {
+                // Filtro por categoría
+                if (currentCategory && product.categoria !== currentCategory) {
+                    return false;
+                }
+                
+                // Filtro por búsqueda - usar 'nombre' en lugar de 'name'
+                if (searchTerm && !product.nombre.toLowerCase().includes(searchTerm.toLowerCase())) {
+                    return false;
+                }
+                
+                return true;
+            });
+
+            // Aplicar ordenamiento - ADAPTADO A COLUMNAS ESPAÑOLAS
+            switch (currentSort) {
+                case 'nombre':
+                    filteredProducts.sort((a, b) => a.nombre.localeCompare(b.nombre));
+                    break;
+                case 'precio_asc':
+                    filteredProducts.sort((a, b) => parseFloat(a.precio) - parseFloat(b.precio));
+                    break;
+                case 'precio_desc':
+                    filteredProducts.sort((a, b) => parseFloat(b.precio) - parseFloat(a.precio));
+                    break;
+                case 'newest':
+                    filteredProducts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                    break;
+            }
+        }
+
+        // Mostrar productos
+        function displayProducts() {
+            const container = document.getElementById('productsContainer');
+            
+            if (filteredProducts.length === 0) {
+                container.innerHTML = `
+                    <div class="no-products">
+                        <i class="fas fa-search fa-3x mb-3 text-muted"></i>
+                        <h3>No se encontraron productos</h3>
+                        <p>Intenta con otros criterios de búsqueda o filtros</p>
+                    </div>
+                `;
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            // Calcular productos para la página actual
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const productsToShow = filteredProducts.slice(startIndex, endIndex);
+
+            container.innerHTML = `
+                <div class="row g-4">
+                    ${productsToShow.map(product => createProductCard(product)).join('')}
+                </div>
+            `;
+
+            // Generar paginación
+            generatePagination();
+        }
+
+        // Crear tarjeta de producto - ADAPTADO A ESTRUCTURA ESPAÑOLA
+        function createProductCard(product) {
+            const stockStatus = getStockStatus(product.stock);
+            const hasDiscount = product.destacado; // Cambiar 'featured' por 'destacado' si usas ese campo
+            
+            return `
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card">
+                        <div class="product-image">
+                            <img src="${product.imagen_url || '../assets/img/no-image.png'}" 
+                                 alt="${product.nombre}" 
+                                 onerror="this.src='../assets/img/no-image.png'">
+                            
+                            ${hasDiscount ? '<span class="badge bg-danger product-badge">¡Oferta!</span>' : ''}
+                            ${stockStatus.badge}
+                            
+                            <div class="product-actions">
+                                <button class="btn btn-light rounded-circle me-2" title="Vista rápida">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-light rounded-circle me-2" title="Agregar a favoritos">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                                <button class="btn btn-light rounded-circle" title="Comparar">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">${product.nombre}</h5>
+                            
+                            ${product.descripcion ? `<p class="card-text text-muted small">${product.descripcion}</p>` : ''}
+                            
+                            <div class="mb-3">
+                                <div class="text-warning mb-1">
+                                    ${generateStars(4)} <!-- Podrías agregar rating a la BD -->
+                                </div>
+                                <small class="text-muted">${getCategoryName(product.categoria)}</small>
+                            </div>
+                            
+                            <div class="price-section mt-auto">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <span class="price-current">$${parseFloat(product.precio).toLocaleString()}</span>
+                                        ${hasDiscount ? '<br><span class="price-original">$' + (parseFloat(product.precio) * 1.15).toLocaleString() + '</span>' : ''}
+                                    </div>
+                                    <span class="badge ${stockStatus.class}">${product.stock} UND</span>
+                                </div>
+                                
+                                <button class="btn btn-add-cart text-white w-100 ${product.stock <= 0 ? 'disabled' : ''}" 
+                                        ${product.stock <= 0 ? 'disabled' : `onclick="addToCartHandler('${product.id}', '${product.nombre}', ${product.precio}, '${product.imagen_url || ''}')"`}>
+                                    <i class="fas fa-shopping-cart me-2"></i>
+                                    ${product.stock <= 0 ? 'Agotado' : 'Agregar al Carrito'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Funciones auxiliares
+        function getStockStatus(stock) {
+            if (stock <= 0) {
+                return {
+                    badge: '<span class="badge bg-danger product-badge" style="top: 50px;">Agotado</span>',
+                    class: 'bg-danger'
+                };
+            } else if (stock <= 10) {
+                return {
+                    badge: '<span class="badge bg-warning product-badge" style="top: 50px;">Pocas unidades</span>',
+                    class: 'bg-warning'
+                };
+            }
+            return {
+                badge: '',
+                class: 'bg-success'
+            };
+        }
+
+        function getCategoryName(category) {
+            const categories = {
+                'chocolates': 'Chocolates',
+                'dulceria': 'Dulcería', 
+                'galleteria': 'Galletería'
+            };
+            return categories[category] || category;
+        }
+
+        function generateStars(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                stars += i <= rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+            }
+            return stars;
+        }
+
+        // Generar paginación
+        function generatePagination() {
+            const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = '';
+            
+            // Botón anterior
+            paginationHTML += `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Anterior</a>
+                </li>
+            `;
+            
+            // Números de página
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    paginationHTML += `
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+                        </li>
+                    `;
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    paginationHTML += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                }
+            }
+            
+            // Botón siguiente
+            paginationHTML += `
+                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Siguiente</a>
+                </li>
+            `;
+            
+            pagination.innerHTML = paginationHTML;
+        }
+
+        // Funciones de filtrado y ordenamiento
+        function filterByCategory(category) {
+            currentCategory = category;
+            currentPage = 1;
+            
+            // Actualizar botones activos
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            applyFiltersAndSort();
+            displayProducts();
+            updateCounter();
+        }
+
+        function searchProducts() {
+            searchTerm = document.getElementById('searchInput').value;
+            currentPage = 1;
+            
+            applyFiltersAndSort();
+            displayProducts();
+            updateCounter();
+        }
+
+        function sortProducts() {
+            currentSort = document.getElementById('sortSelect').value;
+            currentPage = 1;
+            
+            applyFiltersAndSort();
+            displayProducts();
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                displayProducts();
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function changeItemsPerPage() {
+            itemsPerPage = parseInt(document.getElementById('itemsPerPage').value);
+            currentPage = 1;
+            displayProducts();
+        }
+
+        function updateCounter() {
+            const counter = document.getElementById('productsCounter');
+            const total = filteredProducts.length;
+            const showing = Math.min(itemsPerPage, total - (currentPage - 1) * itemsPerPage);
+            const start = total > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
+            const end = (currentPage - 1) * itemsPerPage + showing;
+            
+            counter.innerHTML = `
+                <i class="fas fa-box me-2"></i>
+                Mostrando ${start}-${end} de ${total} productos
+            `;
+        }
+
+        function displayError() {
+            document.getElementById('productsContainer').innerHTML = `
+                <div class="text-center py-5">
+                    <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                    <h3>Error al cargar productos</h3>
+                    <p>Ocurrió un error al cargar los productos. Por favor, recarga la página.</p>
+                    <button class="btn btn-primary" onclick="loadProducts()">Reintentar</button>
+                </div>
+            `;
+        }
+
+        // Handler para agregar al carrito
+        async function addToCartHandler(productId, productName, productPrice, productImage) {
+            if (window.cart) {
+                const success = await window.cart.addToCart(productId, productName, productPrice, productImage, 1);
+                if (success) {
+                    console.log('✅ Producto agregado al carrito:', productName);
+                }
+            } else {
+                console.warn('⚠️ Sistema de carrito no disponible');
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Inicializando página de productos dinámicos...');
+            
+            try {
+                // 1. Cargar componentes
+                await Promise.all([
+                    loadComponent('header-container', './components/header.html'),
+                    loadComponent('navbar-container', './components/navbar.html')
+                ]);
+                
+                console.log('✅ Componentes cargados');
+                
+                // 2. Inicializar AuthManager
+                setTimeout(async () => {
+                    if (window.authManager && !window.authManager.initialized) {
+                        await window.authManager.init();
+                        console.log('✅ AuthManager inicializado');
+                    }
+                    
+                    // 3. Cargar productos
+                    await loadProducts();
+                    
+                    console.log('🎉 Página de productos dinámicos inicializada');
+                }, 100);
+                
+            } catch (error) {
+                console.error('❌ Error al inicializar página:', error);
+                displayError();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Componentes</title>
+</head>
+<body>
+    <!-- HEADER COMPONENT -->
+    <div id="header-component">
+        <header class="w-100" style="background: var(--background-color); color: #151515; padding: 0.7rem 0;">
+            <div class="container-fluid">
+                <div class="row align-items-center g-0">
+                    <!-- Soporte al cliente -->
+                    <div class="col-2 d-flex align-items-center justify-content-center">
+                        <i class="fa-solid fa-headset me-1"></i>
+                        <div class="d-flex flex-column ms-1">
+                            <span style="font-size:1.85rem;">Soporte</span>
+                            <span style="font-size:1.25rem;font-weight:bold;">3225769546</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Logo -->
+                    <div class="col-2 d-flex align-items-center justify-content-end">
+                        <a href="javascript:void(0);" onclick="navigateToHome()">
+                            <img src="frontend/assets/img/imagen/mejora.png" alt="Logo" style="height: 50px;" class="me-2" id="logo-img">
+                        </a>
+                    </div>
+                    
+                    <!-- Nombre de la empresa -->
+                    <div class="col-4 d-flex align-items-center justify-content-start">
+                        <h1 class="display-8 fw-bold text-uppercase nombre-header" style="margin-bottom:0;color:#0a16c5">
+                            Distribuidora de Dulces La Victoria
+                        </h1>
+                    </div>
+                    
+                    <!-- Menú de usuario y carrito -->
+                    <div class="col-4 d-flex align-items-center justify-content-end gap-4">
+                        <!-- Carrito de compras -->
+                        <div class="position-relative">
+                            <a href="#" class="btn btn-outline-secondary d-flex align-items-center gap-2 cart-icon">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                                <span class="d-none d-md-inline">Carrito</span>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                                      style="font-size: 0.6rem; padding: 0.25em 0.5em;" id="cart-badge">0</span>
+                            </a>
+                        </div>
+
+                        <!-- Menú de usuario -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2" 
+                                    type="button" id="userDropdown" data-bs-toggle="dropdown" 
+                                    aria-expanded="false" 
+                                    style="border: 1px solid #ddd; border-radius: 20px; padding: 6px 12px; background: white;">
+                                <i class="fa-regular fa-circle-user fs-5" id="userIcon"></i>
+                                <span class="d-none d-md-inline" id="userName">Cuenta</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm" 
+                                aria-labelledby="userDropdown" 
+                                id="userDropdownMenu"
+                                style="border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; min-width: 220px;">
+                                <!-- El contenido se cargará dinámicamente -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </div>
+
+    <!-- NAVBAR COMPONENT -->
+    <div id="navbar-component">
+        <nav class="w-100" style="background: var(--primary-color); min-height: 48px;">
+            <div class="container d-flex align-items-center justify-content-between py-2">
+                <ul class="nav nav-pills gap-2 mb-0">
+                    <li class="nav-item">
+                        <a href="javascript:void(0);" onclick="navigateTo('/index.html')" class="nav-link" id="nav-inicio" style="color: #fff; font-size: 1.7rem;">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="javascript:void(0);" onclick="navigateTo('/frontend/views/dulceria.html')" class="nav-link" id="nav-dulceria" style="color: #fff; font-size: 1.7rem;">Dulcería</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="javascript:void(0);" onclick="navigateTo('/frontend/views/galleteria.html')" class="nav-link" id="nav-galleteria" style="color: #fff; font-size: 1.7rem;">Galletería</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="javascript:void(0);" onclick="navigateTo('/frontend/views/chocolates.html')" class="nav-link" id="nav-chocolates" style="color: #fff; font-size: 1.7rem;">Chocolates</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="javascript:void(0);" onclick="navigateTo('/frontend/views/contacto.html')" class="nav-link" id="nav-contacto" style="color: #fff; font-size: 1.7rem;">Contacto</a>
+                    </li>
+                </ul>
+                <form class="d-flex" style="max-width: 240px;">
+                    <input type="search" placeholder="Buscar..." class="form-control" style="font-size: 1.75rem;">
+                    <button class="btn btn-light ms-2" type="submit">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </form>
+            </div>
+        </nav>
+    </div>
+
+    <!-- FOOTER COMPONENT -->
+    <div id="footer-component">
+        <footer class="footer">
+            <div class="container container-footer">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <h3>Distribuidora de Dulces La Victoria</h3>
+                        <p>Tu mejor opción en distribución de dulces, chocolates y galletas de la más alta calidad.</p>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <h3>Enlaces Rápidos</h3>
+                        <ul class="list-unstyled">
+                            <li><a href="javascript:void(0);" onclick="navigateTo('/index.html')">Inicio</a></li>
+                            <li><a href="javascript:void(0);" onclick="navigateTo('/frontend/views/dulceria.html')">Dulcería</a></li>
+                            <li><a href="javascript:void(0);" onclick="navigateTo('/frontend/views/galleteria.html')">Galletería</a></li>
+                            <li><a href="javascript:void(0);" onclick="navigateTo('/frontend/views/chocolates.html')">Chocolates</a></li>
+                            <li><a href="javascript:void(0);" onclick="navigateTo('/frontend/views/contacto.html')">Contacto</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h3>Contacto</h3>
+                        <p><i class="fas fa-phone me-2"></i> 322 576 9546</p>
+                        <p><i class="fas fa-envelope me-2"></i> info@dulcesvictoria.com</p>
+                        <div class="social-links">
+                            <a href="#" class="me-2"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="me-2"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="me-2"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="text-center">
+                    <p class="mb-0">&copy; 2025 Distribuidora de Dulces La Victoria. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- SCRIPTS GLOBALES DE AUTENTICACIÓN -->
+    <script>
+        // === CONFIGURACIÓN GLOBAL ===
+        window.APP_CONFIG = {
+            BASE_PATH: '',
+            API_BASE_URL: window.location.hostname === '127.0.0.1' && window.location.port === '5500' 
+                ? 'http://localhost:8012/PROYECTO2/Backend' 
+                : '/PROYECTO2/Backend',
+            SUPABASE_URL: 'YOUR_SUPABASE_URL',
+            SUPABASE_ANON_KEY: 'YOUR_SUPABASE_ANON_KEY'
+        };
+
+        // === FUNCIONES DE NAVEGACIÓN ===
+        function navigateTo(path) {
+            const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+            window.location.href = `${window.APP_CONFIG.BASE_PATH}${normalizedPath}`;
+        }
+
+        function navigateToHome() {
+            window.location.href = `${window.APP_CONFIG.BASE_PATH}/index.html`;
+        }
+
+        // === GESTOR DE AUTENTICACIÓN GLOBAL ===
+        class AuthManager {
+            constructor() {
+                this.currentUser = null;
+                this.initialized = false;
+                this.supabase = null;
+            }
+
+            async init() {
+                try {
+                    console.log('🔧 Inicializando AuthManager...');
+                    
+                    // Inicializar Supabase si está disponible
+                    if (window.supabase) {
+                        this.supabase = window.supabase;
+                        console.log('✅ Supabase disponible');
+                    } else {
+                        console.log('⚠️ Supabase no disponible, usando modo fallback');
+                    }
+                    
+                    await this.checkAuthState();
+                    this.setupEventListeners();
+                    this.initialized = true;
+                    
+                    console.log('✅ AuthManager inicializado');
+                } catch (error) {
+                    console.error('❌ Error inicializando AuthManager:', error);
+                }
+            }
+
+            async checkAuthState() {
+                try {
+                    let user = null;
+                    
+                    // Intentar obtener sesión de Supabase
+                    if (this.supabase) {
+                        const { data: { session }, error } = await this.supabase.auth.getSession();
+                        if (!error && session) {
+                            user = {
+                                id: session.user.id,
+                                email: session.user.email,
+                                nombre_completo: session.user.user_metadata?.full_name || session.user.email,
+                                provider: 'supabase'
+                            };
+                        }
+                    }
+                    
+                    // Fallback: verificar sesión local
+                    if (!user) {
+                        const localSession = localStorage.getItem('userSession');
+                        if (localSession) {
+                            try {
+                                user = JSON.parse(localSession);
+                            } catch (e) {
+                                localStorage.removeItem('userSession');
+                            }
+                        }
+                    }
+                    
+                    this.currentUser = user;
+                    this.updateUI();
+                    
+                    console.log('👤 Estado de autenticación:', user ? 'Autenticado' : 'No autenticado');
+                    return user;
+                } catch (error) {
+                    console.error('❌ Error verificando autenticación:', error);
+                    return null;
+                }
+            }
+
+            updateUI() {
+                const userNameElement = document.getElementById('userName');
+                const userIcon = document.getElementById('userIcon');
+                const userDropdownMenu = document.getElementById('userDropdownMenu');
+                
+                if (!userNameElement || !userDropdownMenu) return;
+
+                if (this.currentUser) {
+                    // Usuario autenticado
+                    const nombreMostrar = this.currentUser.nombre_completo || this.currentUser.email;
+                    const nombreCorto = nombreMostrar.length > 15 ? 
+                        nombreMostrar.split(' ')[0] : nombreMostrar;
+                    
+                    userNameElement.textContent = nombreCorto;
+                    if (userIcon) {
+                        userIcon.className = 'fa-solid fa-circle-user fs-4';
+                    }
+                    
+                    userDropdownMenu.innerHTML = `
+                        <li class="px-3 py-2 text-muted small border-bottom">
+                            <div class="fw-bold">${nombreMostrar}</div>
+                            <div class="text-truncate" style="max-width: 180px;">${this.currentUser.email}</div>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0);" onclick="showProfileModal()">
+                                <i class="fas fa-user me-2" style="width: 20px; text-align: center; color: #6c757d;"></i>
+                                <span>Mi perfil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0);" onclick="navigateTo('/frontend/views/mis-pedidos.html')">
+                                <i class="fas fa-shopping-bag me-2" style="width: 20px; text-align: center; color: #6c757d;"></i>
+                                <span>Mis pedidos</span>
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider my-1"></li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center py-2 text-danger" href="javascript:void(0);" onclick="window.authManager.logout()">
+                                <i class="fas fa-sign-out-alt me-2" style="width: 20px; text-align: center;"></i>
+                                <span>Cerrar sesión</span>
+                            </a>
+                        </li>
+                    `;
+                } else {
+                    // Usuario no autenticado
+                    userNameElement.textContent = 'Cuenta';
+                    if (userIcon) {
+                        userIcon.className = 'fa-regular fa-circle-user fs-4';
+                    }
+                    
+                    userDropdownMenu.innerHTML = `
+                        <li class="px-3 py-2 text-muted small border-bottom">
+                            <div class="fw-bold">Bienvenido</div>
+                            <div>Inicia sesión para continuar</div>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0);" onclick="navigateTo('/frontend/views/login.html')">
+                                <i class="fas fa-sign-in-alt me-2" style="width: 20px; text-align: center; color: #6c757d;"></i>
+                                <span>Iniciar sesión</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0);" onclick="navigateTo('/frontend/views/registro.html')">
+                                <i class="fas fa-user-plus me-2" style="width: 20px; text-align: center; color: #6c757d;"></i>
+                                <span>Crear cuenta</span>
+                            </a>
+                        </li>
+                    `;
+                }
+            }
+
+            setupEventListeners() {
+                // Escuchar cambios de autenticación de Supabase
+                if (this.supabase) {
+                    this.supabase.auth.onAuthStateChange((event, session) => {
+                        console.log('🔄 Cambio de estado auth:', event);
+                        if (event === 'SIGNED_IN' && session) {
+                            this.currentUser = {
+                                id: session.user.id,
+                                email: session.user.email,
+                                nombre_completo: session.user.user_metadata?.full_name || session.user.email,
+                                provider: 'supabase'
+                            };
+                            // Guardar en localStorage para persistencia
+                            localStorage.setItem('userSession', JSON.stringify(this.currentUser));
+                        } else if (event === 'SIGNED_OUT') {
+                            this.currentUser = null;
+                            localStorage.removeItem('userSession');
+                        }
+                        this.updateUI();
+                    });
+                }
+            }
+
+            async logout() {
+                try {
+                    console.log('🚪 Cerrando sesión...');
+                    
+                    // Cerrar sesión en Supabase
+                    if (this.supabase) {
+                        await this.supabase.auth.signOut();
+                    }
+                    
+                    // Limpiar datos locales
+                    this.currentUser = null;
+                    localStorage.removeItem('userSession');
+                    
+                    // Actualizar UI
+                    this.updateUI();
+                    
+                    // Redirigir al home
+                    navigateToHome();
+                    
+                    console.log('✅ Sesión cerrada');
+                } catch (error) {
+                    console.error('❌ Error cerrando sesión:', error);
+                }
+            }
+
+            isAuthenticated() {
+                return !!this.currentUser;
+            }
+
+            getUser() {
+                return this.currentUser;
+            }
+        }
+
+        // === INICIALIZACIÓN GLOBAL ===
+        window.authManager = new AuthManager();
+
+        // Función para mostrar modal de perfil (placeholder)
+        function showProfileModal() {
+            alert('Modal de perfil - Por implementar');
+        }
+
+        // === INICIALIZACIÓN DE BOOTSTRAP ===
+        function initializeBootstrapComponents() {
+            // Inicializar dropdowns
+            const dropdowns = document.querySelectorAll('.dropdown-toggle');
+            dropdowns.forEach(dropdown => {
+                dropdown.setAttribute('data-bs-toggle', 'dropdown');
+                dropdown.setAttribute('aria-expanded', 'false');
+                
+                const dropdownInstance = new bootstrap.Dropdown(dropdown);
+                
+                dropdown.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropdownInstance.toggle();
+                });
+            });
+        }
+
+        // === AUTO-INICIALIZACIÓN ===
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Inicializando componentes...');
+            
+            // Inicializar Bootstrap
+            initializeBootstrapComponents();
+            
+            // Esperar un poco y luego inicializar auth
+            setTimeout(async () => {
+                await window.authManager.init();
+                
+                // Volver a inicializar Bootstrap después del auth
+                setTimeout(initializeBootstrapComponents, 100);
+            }, 100);
+        });
+
+        // Hacer funciones disponibles globalmente
+        window.navigateTo = navigateTo;
+        window.navigateToHome = navigateToHome;
+        window.showProfileModal = showProfileModal;
+    </script>
+</body>
+</html>

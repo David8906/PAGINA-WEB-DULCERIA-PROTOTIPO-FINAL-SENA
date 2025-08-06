@@ -1,0 +1,23 @@
+@media (min-width: 768px) {
+  .gallery-5col {
+    display: flex !important;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    justify-content: center;
+    align-items: stretch;
+  }
+  .gallery-5col > div {
+    flex: 1 1 20%;
+    max-width: 20%;
+    display: flex;
+    align-items: stretch;
+  }
+  .gallery-5col img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    border-radius: 8px;
+    height: auto;
+    display: block;
+  }
+}

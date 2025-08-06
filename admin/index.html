@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración - Distribuidora de Dulces La Victoria</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            padding: 20px 0;
+        }
+        .sidebar .nav-link {
+            color: #333;
+            padding: 10px 20px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+        }
+        .product-image {
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: cover;
+        }
+        .preview-image {
+            max-width: 150px;
+            max-height: 150px;
+            object-fit: cover;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar">
+                <div class="text-center mb-4">
+                    <h4>Panel de Control</h4>
+                    <hr>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" id="dashboard-link">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="productos-link">
+                            <i class="fas fa-box"></i> Productos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="categorias-link">
+                            <i class="fas fa-tags"></i> Categorías
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="pedidos-link">
+                            <i class="fas fa-shopping-cart"></i> Pedidos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="configuracion-link">
+                            <i class="fas fa-cog"></i> Configuración
+                        </a>
+                    </li>
+                    <li class="nav-item mt-5">
+                        <a class="nav-link text-danger" href="#" id="logout-link">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-10 content">
+                <!-- Dashboard -->
+                <div id="dashboard-content">
+                    <h2>Dashboard</h2>
+                    <p>Bienvenido al panel de administración de Distribuidora de Dulces La Victoria.</p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="card text-white bg-primary mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="card-title">Productos</h5>
+                                            <h2 class="mb-0" id="total-productos">0</h2>
+                                        </div>
+                                        <i class="fas fa-box fa-3x"></i>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <a href="#" class="text-white" id="ver-productos-link">Ver detalles <i class="fas fa-arrow-circle-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="card text-white bg-success mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="card-title">Categorías</h5>
+                                            <h2 class="mb-0" id="total-categorias">0</h2>
+                                        </div>
+                                        <i class="fas fa-tags fa-3x"></i>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <a href="#" class="text-white" id="ver-categorias-link">Ver detalles <i class="fas fa-arrow-circle-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="card text-white bg-warning mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="card-title">Pedidos</h5>
+                                            <h2 class="mb-0" id="total-pedidos">0</h2>
+                                        </div>
+                                        <i class="fas fa-shopping-cart fa-3x"></i>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <a href="#" class="text-white" id="ver-pedidos-link">Ver detalles <i class="fas fa-arrow-circle-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Gestión de Productos -->
+                <div id="productos-content" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Gestión de Productos</h2>
+                        <button class="btn btn-primary" id="btn-nuevo-producto">
+                            <i class="fas fa-plus"></i> Nuevo Producto
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover" id="tabla-productos">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Imagen</th>
+                                            <th>Nombre</th>
+                                            <th>Categoría</th>
+                                            <th>Precio</th>
+                                            <th>Stock</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="productos-body">
+                                        <!-- Los productos se cargarán aquí dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Formulario de Producto (oculto inicialmente) -->
+                <div id="formulario-producto" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 id="titulo-formulario">Nuevo Producto</h2>
+                        <button class="btn btn-secondary" id="btn-volver">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <form id="producto-form">
+                                <input type="hidden" id="producto-id">
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="nombre" class="form-label">Nombre del Producto</label>
+                                        <input type="text" class="form-control" id="nombre" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="categoria" class="form-label">Categoría</label>
+                                        <select class="form-select" id="categoria" required>
+                                            <option value="">Seleccione una categoría</option>
+                                            <!-- Las categorías se cargarán dinámicamente -->
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="precio" class="form-label">Precio</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="precio" step="0.01" min="0" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="precio-anterior" class="form-label">Precio Anterior (opcional)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="precio-anterior" step="0.01" min="0">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="stock" class="form-label">Stock</label>
+                                        <input type="number" class="form-control" id="stock" min="0" value="0" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch mt-4 pt-2">
+                                            <input class="form-check-input" type="checkbox" id="destacado" style="width: 3em; height: 1.5em;">
+                                            <label class="form-check-label ms-2" for="destacado">Producto Destacado</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="descripcion" class="form-label">Descripción</label>
+                                    <textarea class="form-control" id="descripcion" rows="3"></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="imagen" class="form-label">Imagen del Producto</label>
+                                    <input class="form-control" type="file" id="imagen" accept="image/*">
+                                    <input type="hidden" id="imagen-url">
+                                    <div class="mt-2">
+                                        <img id="imagen-preview" class="preview-image" alt="Vista previa de la imagen">
+                                    </div>
+                                    <div class="progress mt-2" style="display: none;" id="progress-bar-container">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <div id="upload-status" class="mt-1"></div>
+                                </div>
+                                
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button type="button" class="btn btn-secondary me-md-2" id="btn-cancelar">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary" id="btn-guardar">
+                                        <i class="fas fa-save"></i> Guardar Producto
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Gestión de Categorías -->
+                <div id="categorias-content" style="display: none;">
+                    <h2>Gestión de Categorías</h2>
+                    <!-- Contenido de gestión de categorías -->
+                </div>
+                
+                <!-- Gestión de Pedidos -->
+                <div id="pedidos-content" style="display: none;">
+                    <h2>Gestión de Pedidos</h2>
+                    <!-- Contenido de gestión de pedidos -->
+                </div>
+                
+                <!-- Configuración -->
+                <div id="configuracion-content" style="display: none;">
+                    <h2>Configuración</h2>
+                    <!-- Contenido de configuración -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de que desea eliminar este producto? Esta acción no se puede deshacer.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirm-delete">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="assets/js/admin.js"></script>
+</body>
+</html>

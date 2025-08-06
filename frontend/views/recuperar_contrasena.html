@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña - Distribuidora de Dulces La Victoria</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="../assets/css/estilo.css" />
+    <!-- Incluir Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase-config.js"></script>
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 2rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .recovery-container {
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .recovery-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .recovery-logo img {
+            max-width: 120px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        
+        .recovery-logo h2 {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .recovery-logo p {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .form-control {
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 16px;
+            height: auto;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.15);
+            background-color: white;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+            display: block;
+        }
+        
+        .btn-recovery {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            font-weight: 600;
+            font-size: 16px;
+            width: 100%;
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-recovery:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-recovery:disabled {
+            opacity: 0.7;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .back-to-login {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+        }
+        
+        .back-to-login a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-to-login a:hover {
+            color: #5a6fd8;
+            transform: translateX(-3px);
+        }
+        
+        .success-container {
+            text-align: center;
+            display: none;
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+        
+        .alert {
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border: none;
+        }
+        
+        .alert-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+        
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+        
+        @media (max-width: 576px) {
+            .recovery-container {
+                margin: 20px;
+                padding: 30px 25px;
+            }
+            
+            .recovery-logo h2 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        /* Animaciones */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .recovery-container {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .email-sent-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Cargar Componentes -->
+    <div id="header-container"></div>
+    <div id="navbar-container"></div>
+    
+    <div class="main-content">
+        <div class="container">
+            <div class="recovery-container">
+                <!-- Formulario inicial -->
+                <div id="recoveryForm" class="recovery-form">
+                    <div class="recovery-logo">
+                        <img src="../assets/img/imagen/mejora.png" alt="Logo Distribuidora de Dulces La Victoria">
+                        <h2>Recuperar Contraseña</h2>
+                        <p>Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña de forma segura</p>
+                    </div>
+                    
+                    <form id="passwordResetForm" class="needs-validation" novalidate>
+                        <div id="alertContainer"></div>
+                        
+                        <div class="mb-4">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope me-2"></i>Correo Electrónico
+                            </label>
+                            <input 
+                                type="email" 
+                                class="form-control" 
+                                id="email" 
+                                name="email" 
+                                placeholder="ejemplo@correo.com"
+                                required
+                                autocomplete="email"
+                            >
+                            <div class="invalid-feedback">
+                                Por favor ingresa un correo electrónico válido.
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mb-4">
+                            <button type="submit" class="btn btn-recovery">
+                                <span class="btn-text">
+                                    <i class="fas fa-paper-plane me-2"></i>
+                                    Enviar Enlace de Recuperación
+                                </span>
+                                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Mensaje de éxito -->
+                <div id="successContainer" class="success-container">
+                    <div class="success-icon email-sent-animation">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h3 class="mb-3">¡Correo Enviado!</h3>
+                    <p class="text-muted mb-4">
+                        Hemos enviado un enlace de recuperación a tu correo electrónico. 
+                        Por favor revisa tu bandeja de entrada y sigue las instrucciones.
+                    </p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Nota:</strong> El enlace expirará en 1 hora por motivos de seguridad.
+                        Si no ves el correo, revisa tu carpeta de spam.
+                    </div>
+                </div>
+                
+                <!-- Enlaces de navegación -->
+                <div class="back-to-login">
+                    <a href="login.html" class="text-decoration-none">
+                        <i class="fas fa-arrow-left"></i>
+                        Volver al Inicio de Sesión
+                    </a>
+                    <div class="mt-3">
+                        <span class="text-muted">¿No tienes cuenta? </span>
+                        <a href="registro.html" class="text-decoration-none">Regístrate aquí</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+    // Configuración de rutas base
+    window.basePath = '';
+    
+    // Función para navegar a una ruta
+    window.navigateTo = function(path) {
+        window.location.href = `${window.basePath}${path}`;
+    };
+    
+    // Función para cargar componentes
+    const loadComponent = (elementId, path) => {
+        return fetch(path)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById(elementId).innerHTML = html;
+                return html;
+            })
+            .catch(error => {
+                console.error(`Error al cargar ${path}:`, error);
+                return '';
+            });
+    };
+
+    // Función para mostrar alertas
+    function showAlert(message, type = 'danger', icon = null) {
+        const alertContainer = document.getElementById('alertContainer');
+        const iconHtml = icon ? `<i class="${icon} me-2"></i>` : '';
+        
+        alertContainer.innerHTML = `
+            <div class="alert alert-${type}" role="alert">
+                ${iconHtml}${message}
+            </div>
+        `;
+        
+        // Desplazarse al mensaje
+        alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Función para limpiar alertas
+    function clearAlerts() {
+        const alertContainer = document.getElementById('alertContainer');
+        alertContainer.innerHTML = '';
+    }
+
+    // Función para validar email
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    // Función para mostrar el contenedor de éxito
+    function showSuccessContainer(email) {
+        const recoveryForm = document.getElementById('recoveryForm');
+        const successContainer = document.getElementById('successContainer');
+        
+        // Actualizar el mensaje con el email
+        const messageElement = successContainer.querySelector('p');
+        messageElement.innerHTML = `
+            Hemos enviado un enlace de recuperación a <strong>${email}</strong>. 
+            Por favor revisa tu bandeja de entrada y sigue las instrucciones.
+        `;
+        
+        // Ocultar formulario y mostrar éxito
+        recoveryForm.style.display = 'none';
+        successContainer.style.display = 'block';
+    }
+
+    // Manejar el envío del formulario
+    document.getElementById('passwordResetForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Obtener elementos del DOM
+        const form = this;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const spinner = submitBtn.querySelector('.spinner-border');
+        const emailInput = document.getElementById('email');
+        
+        // Limpiar alertas previas
+        clearAlerts();
+        
+        // Validaciones básicas
+        const email = emailInput.value.trim().toLowerCase();
+        
+        if (!email) {
+            showAlert('Por favor ingresa tu correo electrónico.', 'danger', 'fas fa-exclamation-triangle');
+            emailInput.focus();
+            return;
+        }
+        
+        if (!isValidEmail(email)) {
+            showAlert('Por favor ingresa un correo electrónico válido.', 'danger', 'fas fa-exclamation-triangle');
+            emailInput.focus();
+            return;
+        }
+        
+        // Mostrar indicador de carga
+        submitBtn.disabled = true;
+        btnText.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enviando...';
+        spinner.classList.remove('d-none');
+        
+        try {
+            console.log('Enviando solicitud de recuperación para:', email);
+            
+            // Llamar a la función de recuperación de contraseña
+            const result = await resetPassword(email);
+            
+            if (result.success) {
+                console.log('Correo de recuperación enviado exitosamente');
+                
+                // Mostrar mensaje de éxito
+                showAlert(
+                    'Correo enviado exitosamente. Revisa tu bandeja de entrada.',
+                    'success',
+                    'fas fa-check-circle'
+                );
+                
+                // Después de 2 segundos, mostrar la pantalla de éxito
+                setTimeout(() => {
+                    showSuccessContainer(email);
+                }, 2000);
+                
+            } else {
+                console.error('Error al enviar correo:', result.error);
+                
+                // Manejar diferentes tipos de errores
+                let errorMessage = 'Error al enviar el correo de recuperación.';
+                
+                if (result.error.includes('User not found') || result.error.includes('not found')) {
+                    errorMessage = 'No encontramos una cuenta asociada a este correo electrónico.';
+                } else if (result.error.includes('rate limit') || result.error.includes('too many requests')) {
+                    errorMessage = 'Has enviado demasiadas solicitudes. Por favor espera unos minutos e intenta de nuevo.';
+                } else if (result.error.includes('network') || result.error.includes('fetch')) {
+                    errorMessage = 'Error de conexión. Por favor verifica tu conexión a internet e intenta de nuevo.';
+                }
+                
+                showAlert(errorMessage, 'danger', 'fas fa-exclamation-triangle');
+            }
+            
+        } catch (error) {
+            console.error('Error inesperado:', error);
+            showAlert(
+                'Ocurrió un error inesperado. Por favor intenta de nuevo más tarde.',
+                'danger',
+                'fas fa-exclamation-triangle'
+            );
+        } finally {
+            // Restaurar botón
+            submitBtn.disabled = false;
+            btnText.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Enviar Enlace de Recuperación';
+            spinner.classList.add('d-none');
+        }
+    });
+
+    // Validación en tiempo real del email
+    document.getElementById('email').addEventListener('input', function() {
+        const email = this.value.trim();
+        clearAlerts();
+        
+        if (email && !isValidEmail(email)) {
+            this.classList.add('is-invalid');
+        } else {
+            this.classList.remove('is-invalid');
+        }
+    });
+
+    // Inicialización cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Página de recuperación cargada');
+        
+        // Cargar componentes del header y navbar
+        Promise.all([
+            loadComponent('header-container', './components/header.html'),
+            loadComponent('navbar-container', './components/navbar.html')
+        ]).then(() => {
+            console.log('Componentes cargados exitosamente');
+        }).catch(error => {
+            console.error('Error al cargar componentes:', error);
+        });
+
+        // Enfocar el campo de email
+        const emailInput = document.getElementById('email');
+        if (emailInput) {
+            emailInput.focus();
+        }
+        
+        // Validación de Bootstrap
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+        })();
+    });
+    </script>
+</body>
+</html>

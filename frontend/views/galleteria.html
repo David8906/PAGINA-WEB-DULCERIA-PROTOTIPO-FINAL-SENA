@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Galletería - Distribuidora de Dulces La Victoria</title>
+    
+    <!-- SCRIPTS REQUERIDOS EN ESTE ORDEN -->
+    <!-- 1. Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- 2. Bootstrap y Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- 3. Estilos personalizados -->
+    <link rel="stylesheet" href="../assets/css/estilo.css" />
+    <link rel="stylesheet" href="../assets/css/gallery-5col.css" />
+    
+    <!-- 4. jQuery y Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .main-content {
+            flex: 1;
+            padding: 2rem 0;
+        }
+        
+        /* Estilos para loading */
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #28a745;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Efectos hover para productos */
+        .card:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+        }
+        
+        .product-actions {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .card:hover .product-actions {
+            opacity: 1;
+        }
+        
+        /* Indicador de stock agotado */
+        .out-of-stock::after {
+            content: 'AGOTADO';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            z-index: 10;
+        }
+        
+        .out-of-stock img {
+            opacity: 0.5;
+        }
+        
+        /* Estilo especial para galletas */
+        .galleteria-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body class="index-page">
+    <!-- Cargar Componentes -->
+    <div id="header-container"></div>
+    <div id="navbar-container"></div>
+
+    <!-- Botón de WhatsApp -->
+    <a href="https://wa.me/573209663355" class="whatsapp-float" target="_blank" title="¡Contáctanos por WhatsApp!" aria-label="Chatea con nosotros por WhatsApp">
+        <i class="fa-brands fa-whatsapp"></i> Escríbenos
+    </a>
+
+    <main class="bg-light py-5">
+        <div class="container">
+            <div class="galleteria-header text-center mb-5">
+                <h2 class="display-5 fw-bold text-uppercase mb-3">🍪 Nuestras Galletas Artesanales</h2>
+                <p class="lead text-muted">Crujientes, deliciosas y perfectas para cada momento</p>
+            </div>
+            
+            <!-- Debug Info (se ocultará automáticamente) -->
+            <div id="debug-info" class="alert alert-info d-none">
+                <strong>Debug Info:</strong>
+                <div id="debug-content"></div>
+            </div>
+            
+            <!-- Contenedor dinámico de productos -->
+            <div class="row g-4" id="productos-container">
+                <!-- Loading inicial -->
+                <div class="col-12">
+                    <div class="loading-container">
+                        <div class="text-center">
+                            <div class="loading-spinner mb-3"></div>
+                            <p class="text-muted">Cargando deliciosas galletas...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container container-footer">
+            <div class="menu-footer">
+                <div class="contact-info">
+                    <p class="title-footer">Información de Contacto</p>
+                    <ul>
+                        <li>Dirección: calle 105 b # 67-39</li>
+                        <li>Teléfono: (601)-778-56-71</li>
+                        <li>Fax: 778-56-71 opción (1)</li>
+                        <li>EmaiL: distribuidoradedulceslavictoria@gmail.com</li>
+                    </ul>
+                    <div class="social-icons">
+                        <span class="facebook"><i class="fa-brands fa-facebook-f"></i></span>
+                        <span class="twitter"><i class="fa-brands fa-twitter"></i></span>
+                        <span class="youtube"><i class="fa-brands fa-youtube"></i></span>
+                        <span class="pinterest"><i class="fa-brands fa-pinterest-p"></i></span>
+                        <span class="instagram"><i class="fa-brands fa-instagram"></i></span>
+                    </div>
+                </div>
+
+                <div class="information">
+                    <p class="title-footer">Información</p>
+                    <ul>
+                        <li><a href="#">Acerca de Nosotros</a></li>
+                        <li><a href="#">Información Domicilios</a></li>
+                        <li><a href="#">Politicas de Privacidad</a></li>
+                        <li><a href="#">Términos y condiciones</a></li>
+                        <li><a href="#">Contactános</a></li>
+                    </ul>
+                </div>
+
+                <div class="my-account">
+                    <p class="title-footer">Mi cuenta</p>
+                    <ul>
+                        <li><a href="#">Mi cuenta</a></li>
+                        <li><a href="#">Historial de ordenes</a></li>
+                        <li><a href="#">Lista de deseos</a></li>
+                        <li><a href="#">Boletín</a></li>
+                        <li><a href="#">Reembolsos</a></li>
+                    </ul>
+                </div>
+
+                <div class="newsletter">
+                    <p class="title-footer">Boletín informativo</p>
+                    <div class="content">
+                        <p>Suscríbete a nuestros boletines ahora y mantente al día con nuevas colecciones y ofertas exclusivas.</p>
+                        <input type="email" placeholder="Ingresa el correo aquí...">
+                        <button>Suscríbete</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>Desarrollado por: DISEÑO WEB DR &copy; 2024</p>
+                <img src="../assets/img/imagen/payment.png" alt="Pagos">
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS DE AUTENTICACIÓN - ORDEN CRÍTICO -->
+    <script src="../assets/js/supabase-config.js"></script>
+    <script src="../assets/js/auth_manager.js"></script>
+    <script src="../assets/js/script.js"></script>
+
+    <!-- SCRIPT DINÁMICO DE PRODUCTOS - VERSIÓN ROBUSTA -->
+    <script>
+        // ===== VARIABLES GLOBALES =====
+        let productos = [];
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        let debugMode = window.location.search.includes('debug=true');
+
+        // ===== CONFIGURACIÓN DINÁMICA =====
+        let CONFIG = {
+            categoria: 'galleteria',
+            columnaCategoria: 'categorias',
+            columnaStock: 'existencia',
+            columnaImagen: 'URL_de_imagen',
+            columnaActivo: 'activo'
+        };
+
+        // ===== FUNCIÓN DE DEBUG =====
+        function debug(mensaje, datos = null) {
+            console.log(`🍪 [GALLETERÍA] ${mensaje}`, datos || '');
+            
+            if (debugMode) {
+                const debugInfo = document.getElementById('debug-info');
+                const debugContent = document.getElementById('debug-content');
+                if (debugInfo && debugContent) {
+                    debugInfo.classList.remove('d-none');
+                    debugContent.innerHTML += `<br>• ${mensaje}`;
+                    if (datos) debugContent.innerHTML += `: ${JSON.stringify(datos)}`;
+                }
+            }
+        }
+
+        // ===== FUNCIÓN PARA DETECTAR CONFIGURACIÓN =====
+        async function detectarConfiguracion() {
+            try {
+                debug('Detectando configuración de base de datos...');
+                
+                // Obtener un producto de muestra para detectar columnas
+                const { data: muestra, error } = await supabase
+                    .from('productos')
+                    .select('*')
+                    .limit(1);
+                    
+                if (error) throw error;
+                
+                if (muestra && muestra.length > 0) {
+                    const columnas = Object.keys(muestra[0]);
+                    debug('Columnas detectadas', columnas);
+                    
+                    // Detectar columna de categoría
+                    const posiblesCategoria = ['categorias', 'categoria', 'category', 'tipo'];
+                    for (const col of posiblesCategoria) {
+                        if (columnas.includes(col)) {
+                            CONFIG.columnaCategoria = col;
+                            break;
+                        }
+                    }
+                    
+                    // Detectar columna de stock
+                    const posiblesStock = ['existencia', 'stock', 'cantidad', 'inventory'];
+                    for (const col of posiblesStock) {
+                        if (columnas.includes(col)) {
+                            CONFIG.columnaStock = col;
+                            break;
+                        }
+                    }
+                    
+                    // Detectar columna de imagen
+                    const posiblesImagen = ['URL_de_imagen', 'imagen_url', 'image_url', 'foto', 'imagen'];
+                    for (const col of posiblesImagen) {
+                        if (columnas.includes(col)) {
+                            CONFIG.columnaImagen = col;
+                            break;
+                        }
+                    }
+                    
+                    // Detectar columna activo
+                    const posiblesActivo = ['activo', 'active', 'enabled', 'visible'];
+                    for (const col of posiblesActivo) {
+                        if (columnas.includes(col)) {
+                            CONFIG.columnaActivo = col;
+                            break;
+                        }
+                    }
+                    
+                    debug('Configuración detectada', CONFIG);
+                }
+                
+                return true;
+            } catch (error) {
+                debug('Error detectando configuración', error.message);
+                return false;
+            }
+        }
+
+        // ===== FUNCIÓN PRINCIPAL PARA CARGAR PRODUCTOS =====
+        async function cargarProductos() {
+            try {
+                debug('Iniciando carga de productos de galletería...');
+                
+                // Detectar configuración primero
+                await detectarConfiguracion();
+                
+                // Estrategia 1: Intentar consulta completa
+                let productosData = null;
+                let error = null;
+                
+                try {
+                    debug(`Intentando consulta con filtros: ${CONFIG.columnaCategoria}=${CONFIG.categoria}`);
+                    
+                    let query = supabase.from('productos').select('*');
+                    
+                    // Filtrar por categoría
+                    query = query.eq(CONFIG.columnaCategoria, CONFIG.categoria);
+                    
+                    // Solo agregar filtro activo si la columna existe
+                    if (CONFIG.columnaActivo) {
+                        query = query.eq(CONFIG.columnaActivo, true);
+                    }
+                    
+                    const result = await query.order('nombre', { ascending: true });
+                    productosData = result.data;
+                    error = result.error;
+                    
+                } catch (e) {
+                    error = e;
+                    debug('Error en consulta con filtros', e.message);
+                }
+                
+                // Estrategia 2: Si falla, intentar sin filtro activo
+                if (error || !productosData || productosData.length === 0) {
+                    try {
+                        debug('Intentando consulta sin filtro activo...');
+                        
+                        const result = await supabase
+                            .from('productos')
+                            .select('*')
+                            .eq(CONFIG.columnaCategoria, CONFIG.categoria)
+                            .order('nombre', { ascending: true });
+                            
+                        productosData = result.data;
+                        error = result.error;
+                        
+                    } catch (e) {
+                        error = e;
+                        debug('Error en consulta sin filtro activo', e.message);
+                    }
+                }
+                
+                // Estrategia 3: Si aún falla, obtener todos y filtrar manualmente
+                if (error || !productosData || productosData.length === 0) {
+                    try {
+                        debug('Intentando obtener todos los productos y filtrar manualmente...');
+                        
+                        const result = await supabase
+                            .from('productos')
+                            .select('*')
+                            .order('nombre', { ascending: true });
+                            
+                        if (result.error) throw result.error;
+                        
+                        // Filtrar manualmente por categoría (buscar galletas/galleteria)
+                        productosData = result.data.filter(producto => {
+                            const categoria = producto[CONFIG.columnaCategoria];
+                            return categoria && (
+                                categoria.toLowerCase().includes('gallet') ||
+                                categoria.toLowerCase().includes('wafer') ||
+                                categoria.toLowerCase().includes('cookie')
+                            );
+                        });
+                        
+                        debug(`Productos filtrados manualmente: ${productosData.length}`);
+                        
+                    } catch (e) {
+                        throw new Error(`Error obteniendo productos: ${e.message}`);
+                    }
+                }
+                
+                if (error) {
+                    throw error;
+                }
+                
+                productos = productosData || [];
+                debug(`Productos cargados exitosamente: ${productos.length}`);
+                
+                mostrarProductos(productos);
+                
+            } catch (error) {
+                debug('Error cargando productos', error.message);
+                console.error('❌ Error cargando productos:', error);
+                mostrarError('Error al cargar productos. Por favor, recarga la página.');
+            }
+        }
+
+        // ===== FUNCIÓN PARA MOSTRAR PRODUCTOS =====
+        function mostrarProductos(productos) {
+            const container = document.getElementById('productos-container');
+            
+            debug(`Mostrando ${productos.length} productos`);
+            
+            if (productos.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12 text-center">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No hay productos de galletería disponibles en este momento.
+                            <button class="btn btn-outline-warning btn-sm ms-3" onclick="cargarProductos()">
+                                <i class="fas fa-sync-alt me-1"></i>Reintentar
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            productos.forEach(producto => {
+                // Obtener valores usando la configuración detectada
+                const precio = producto.precio || 0;
+                const stock = producto[CONFIG.columnaStock] || 0;
+                const imagen = producto[CONFIG.columnaImagen] || '../assets/img/imagen/placeholder.jpg';
+                const nombre = producto.nombre || 'Producto sin nombre';
+                const descripcion = producto.descripcion || 'Galletas artesanales de la mejor calidad';
+                
+                // Calcular descuento aleatorio (galletas tienen descuentos menores)
+                const tieneDescuento = Math.random() > 0.5;
+                const porcentajeDescuento = Math.floor(Math.random() * 15) + 5;
+                const precioOriginal = tieneDescuento ? Math.round(precio * 1.08) : null;
+                
+                // Verificar stock
+                const sinStock = stock <= 0;
+                const stockBajo = stock > 0 && stock <= 10;
+                
+                html += `
+                    <div class="col-12 col-sm-6 col-lg-4 d-flex">
+                        <div class="card h-100 w-100 border-0 shadow-sm overflow-hidden">
+                            <div class="position-relative" style="height: 220px; background-color: #fff8f8;">
+                                <div class="d-flex align-items-center justify-content-center h-100 ${sinStock ? 'out-of-stock' : ''}">
+                                    <img src="${imagen}" 
+                                         class="img-fluid p-4" 
+                                         alt="${nombre}"
+                                         style="max-height: 100%; max-width: 100%; object-fit: contain;"
+                                         onerror="this.src='../assets/img/imagen/placeholder.jpg'">
+                                </div>
+                                
+                                ${tieneDescuento && !sinStock ? 
+                                    `<span class="position-absolute top-0 end-0 m-3 bg-danger text-white px-3 py-1 rounded-pill fw-bold small">-${porcentajeDescuento}% OFF</span>` : 
+                                    ''
+                                }
+                                
+                                ${stockBajo && !sinStock ? 
+                                    `<span class="position-absolute top-0 start-0 m-3 bg-warning text-dark px-2 py-1 rounded-pill fw-bold small">¡Últimas ${stock}!</span>` : 
+                                    ''
+                                }
+                                
+                                <div class="position-absolute bottom-0 start-0 end-0 d-flex justify-content-center gap-2 mb-3 product-actions">
+                                    <button class="btn btn-light rounded-circle p-2" onclick="verDetalles(${producto.id})" title="Ver detalles">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-light rounded-circle p-2" onclick="toggleFavorito(${producto.id})" title="Agregar a favoritos">
+                                        <i class="fa-regular fa-heart"></i>
+                                    </button>
+                                    <button class="btn btn-light rounded-circle p-2" onclick="compartirProducto(${producto.id})" title="Compartir">
+                                        <i class="fa-solid fa-share"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold mb-2 text-center">${nombre}</h5>
+                                <div class="mb-3 text-center text-warning">
+                                    ${generarEstrellas()}
+                                </div>
+                                <div class="mt-auto d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="h5 fw-bold text-success mb-0">$${precio.toLocaleString()}</span>
+                                        ${precioOriginal ? 
+                                            `<small class="d-block text-muted text-decoration-line-through">$${precioOriginal.toLocaleString()}</small>` : 
+                                            ''
+                                        }
+                                    </div>
+                                    <button class="btn btn-success rounded-circle d-flex align-items-center justify-content-center" 
+                                            style="width: 40px; height: 40px;"
+                                            onclick="agregarAlCarrito(${producto.id})"
+                                            ${sinStock ? 'disabled' : ''}
+                                            title="${sinStock ? 'Producto agotado' : 'Agregar al carrito'}">
+                                        <i class="fas fa-shopping-basket"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // ===== FUNCIONES AUXILIARES =====
+        function generarEstrellas() {
+            const rating = Math.floor(Math.random() * 2) + 4; // 4-5 estrellas (galletas de calidad)
+            const tieneMedia = Math.random() > 0.6;
+            let estrellas = '';
+            
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    estrellas += '<i class="fas fa-star"></i>';
+                } else if (i === rating + 1 && tieneMedia) {
+                    estrellas += '<i class="fas fa-star-half-alt"></i>';
+                } else {
+                    estrellas += '<i class="far fa-star"></i>';
+                }
+            }
+            return estrellas;
+        }
+
+        function mostrarError(mensaje) {
+            const container = document.getElementById('productos-container');
+            container.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-danger text-center">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        ${mensaje}
+                        <br><br>
+                        <button class="btn btn-outline-danger btn-sm me-2" onclick="cargarProductos()">
+                            <i class="fas fa-sync-alt me-1"></i>Reintentar
+                        </button>
+                        <button class="btn btn-outline-info btn-sm" onclick="window.location.href += '?debug=true'; window.location.reload();">
+                            <i class="fas fa-bug me-1"></i>Modo Debug
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ===== FUNCIONES DE INTERACCIÓN =====
+        function verDetalles(productId) {
+            const producto = productos.find(p => p.id === productId);
+            if (producto) {
+                const stock = producto[CONFIG.columnaStock] || 0;
+                alert(`Detalles de: ${producto.nombre}\n\n${producto.descripcion || 'Galletas artesanales de la mejor calidad'}\n\nPrecio: $${producto.precio.toLocaleString()}\nStock disponible: ${stock} unidades`);
+            }
+        }
+
+        function toggleFavorito(productId) {
+            const producto = productos.find(p => p.id === productId);
+            if (producto) {
+                mostrarNotificacion(`${producto.nombre} agregado a favoritos`, 'success');
+            }
+        }
+
+        function compartirProducto(productId) {
+            const producto = productos.find(p => p.id === productId);
+            if (producto) {
+                if (navigator.share) {
+                    navigator.share({
+                        title: producto.nombre,
+                        text: `¡Mira estas deliciosas galletas! ${producto.descripcion || ''}`,
+                        url: window.location.href
+                    });
+                } else {
+                    const url = `${window.location.href}?producto=${productId}`;
+                    navigator.clipboard.writeText(url).then(() => {
+                        mostrarNotificacion('Enlace copiado al portapapeles', 'info');
+                    });
+                }
+            }
+        }
+
+        function agregarAlCarrito(productId) {
+            const producto = productos.find(p => p.id === productId);
+            if (producto) {
+                const stock = producto[CONFIG.columnaStock] || 0;
+                if (stock > 0) {
+                    const itemExistente = carrito.find(item => item.id === productId);
+                    
+                    if (itemExistente) {
+                        itemExistente.cantidad += 1;
+                    } else {
+                        carrito.push({
+                            id: producto.id,
+                            nombre: producto.nombre,
+                            precio: producto.precio,
+                            imagen_url: producto[CONFIG.columnaImagen],
+                            cantidad: 1
+                        });
+                    }
+                    
+                    localStorage.setItem('carrito', JSON.stringify(carrito));
+                    actualizarContadorCarrito();
+                    mostrarNotificacion(`${producto.nombre} agregado al carrito`, 'success');
+                }
+            }
+        }
+
+        function actualizarContadorCarrito() {
+            const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
+            const badge = document.getElementById('cart-badge');
+            if (badge) {
+                badge.textContent = totalItems;
+            }
+        }
+
+        function mostrarNotificacion(mensaje, tipo = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${tipo} position-fixed`;
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.innerHTML = `
+                <i class="fas fa-${tipo === 'success' ? 'check' : tipo === 'error' ? 'exclamation-triangle' : 'info'}-circle me-2"></i>
+                ${mensaje}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // ===== FUNCIONES DE CONFIGURACIÓN =====
+        function navigateTo(path) {
+            window.location.href = path;
+        }
+        
+        const loadComponent = (elementId, path) => {
+            return fetch(path)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById(elementId).innerHTML = html;
+                    return html;
+                })
+                .catch(error => {
+                    console.error('Error cargando componente:', error);
+                    return '';
+                });
+        };
+
+        // ===== INICIALIZACIÓN =====
+        document.addEventListener('DOMContentLoaded', async function() {
+            debug('Inicializando página dinámica de galletería...');
+            
+            try {
+                // 1. Cargar componentes primero
+                await Promise.all([
+                    loadComponent('header-container', './components/header.html'),
+                    loadComponent('navbar-container', './components/navbar.html')
+                ]);
+                
+                debug('Componentes cargados');
+                
+                // 2. Esperar un poco para que los elementos se rendericen
+                setTimeout(async () => {
+                    // 3. Inicializar AuthManager
+                    if (window.authManager && !window.authManager.initialized) {
+                        await window.authManager.init();
+                        debug('AuthManager inicializado');
+                    }
+                    
+                    // 4. Cargar productos dinámicamente
+                    await cargarProductos();
+                    
+                    // 5. Actualizar contador del carrito
+                    actualizarContadorCarrito();
+                    
+                    // 6. Marcar enlace activo en navbar
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        const href = link.getAttribute('onclick');
+                        if (href && href.includes('galleteria.html')) {
+                            link.classList.add('active');
+                            link.style.color = 'var(--primary-color)';
+                            link.style.background = '#fff';
+                            link.setAttribute('aria-current', 'page');
+                        } else {
+                            link.classList.remove('active');
+                            link.style.color = '#fff';
+                            link.style.background = 'transparent';
+                            link.removeAttribute('aria-current');
+                        }
+                    });
+                    
+                    debug('Página completamente inicializada');
+                }, 100);
+                
+            } catch (error) {
+                debug('Error al inicializar la página', error.message);
+                console.error('❌ Error al inicializar la página:', error);
+                mostrarError('Error al inicializar la página');
+            }
+        });
+
+        // Exponer funciones para debugging
+        window.cargarProductosGalleteria = cargarProductos;
+        window.debugGalleteria = () => { debugMode = true; cargarProductos(); };
+    </script>
+</body>
+</html>

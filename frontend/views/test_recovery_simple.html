@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Recovery</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+        .container { background: #f5f5f5; padding: 20px; border-radius: 10px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 10px 0; }
+        input { padding: 10px; margin: 10px 0; width: 100%; box-sizing: border-box; }
+        .log { background: #333; color: #0f0; padding: 15px; border-radius: 5px; font-family: monospace; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+        .success { background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .error { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test de Recuperación de Contraseña</h1>
+        
+        <div>
+            <h3>Paso 1: Configuración</h3>
+            <p>URL actual: <code id="currentUrl"></code></p>
+            <p>Entorno: <span id="environment"></span></p>
+        </div>
+        
+        <div>
+            <h3>Paso 2: Solicitar recuperación</h3>
+            <input type="email" id="testEmail" placeholder="tu@email.com" value="diego_mal@hotmail.com">
+            <button onclick="testRecovery()">🔥 Enviar con URL FORZADA</button>
+            <div id="recoveryResult"></div>
+        </div>
+        
+        <div>
+            <h3>Paso 3: Logs detallados</h3>
+            <div id="logs" class="log"></div>
+            <button onclick="clearLogs()">Limpiar logs</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuración
+        const SUPABASE_URL = 'https://zgvrrprekjsmbsmlavaw.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpndnJycHJla2pzbWJzbWxhdmF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzk0ODAsImV4cCI6MjA2ODYxNTQ4MH0.G68U8d3iYM6HiPV70o7rn-ebVpU0kkYYlwG-P6fNMtE';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let logs = [];
+
+        function addLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}`;
+            logs.push(logMessage);
+            document.getElementById('logs').textContent = logs.join('\n');
+            console.log(logMessage);
+        }
+
+        function clearLogs() {
+            logs = [];
+            document.getElementById('logs').textContent = '';
+        }
+
+        async function testRecovery() {
+            const email = document.getElementById('testEmail').value;
+            const resultDiv = document.getElementById('recoveryResult');
+            
+            if (!email) {
+                resultDiv.innerHTML = '<div class="error">❌ Por favor ingresa un email</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<div>⏳ Enviando...</div>';
+            addLog('=== INICIO TEST DE RECOVERY ===');
+            addLog('Email: ' + email);
+            
+            try {
+                // FORZAR la URL específica
+                const FORCED_URL = 'https://paginas-web-ten.vercel.app/frontend/views/reset_password_page.html';
+                addLog('URL FORZADA: ' + FORCED_URL);
+                
+                const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: FORCED_URL
+                });
+                
+                if (error) {
+                    addLog('❌ ERROR: ' + error.message);
+                    resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                } else {
+                    addLog('✅ SUCCESS: Correo enviado');
+                    addLog('Data recibida: ' + JSON.stringify(data));
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            ✅ ¡Correo enviado exitosamente!<br>
+                            <strong>IMPORTANTE:</strong> Revisa tu correo y verifica que la URL sea:<br>
+                            <code>${FORCED_URL}</code>
+                        </div>
+                    `;
+                }
+                
+            } catch (err) {
+                addLog('❌ EXCEPCIÓN: ' + err.message);
+                resultDiv.innerHTML = `<div class="error">❌ Excepción: ${err.message}</div>`;
+            }
+            
+            addLog('=== FIN TEST ===');
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('currentUrl').textContent = window.location.href;
+            
+            const isVercel = window.location.hostname.includes('vercel.app');
+            const isLocalhost = window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1');
+            
+            let env = 'Desconocido';
+            if (isVercel) env = 'Vercel';
+            else if (isLocalhost) env = 'Localhost';
+            
+            document.getElementById('environment').textContent = env;
+            addLog('Entorno detectado: ' + env);
+            addLog('Hostname: ' + window.location.hostname);
+        });
+    </script>
+</body>
+</html>
